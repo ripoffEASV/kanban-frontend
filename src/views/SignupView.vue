@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Signup from '../components/Signup.vue'
+import Signup from '../components/SignupForm.vue'
 </script>
 
 <template>
       <Signup />
-</template>
+</template>../components/SignupForm.vue
