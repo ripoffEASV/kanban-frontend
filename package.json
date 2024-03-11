@@ -16,6 +16,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "overlayscrollbars": "^2.6.0",
+    "overlayscrollbars-vue": "^0.5.7",
     "pinia": "^2.1.7",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"
