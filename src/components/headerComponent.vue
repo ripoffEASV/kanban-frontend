@@ -77,7 +77,7 @@ onMounted(() => {
     </div>
     <div v-if="!isLoggedIn" class="nav_item">
       <button type="button" class="btn btn-primary">
-        <RouterLink to="/signup">Signup</RouterLink>
+        <RouterLink to="/signup" class="text-white">Signup</RouterLink>
       </button>
     </div>
     

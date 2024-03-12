@@ -119,7 +119,7 @@ const orgNameCheck = () => {
 }
 
 const loadOrg = async (orgID: string) => {
-  const org: CurrentOrg = await Organization.getSpecificOrg(orgID)
+  const org: CurrentOrg[] = await Organization.getSpecificOrg(orgID)
   console.log(org[0]._id)
 
   currentOrg.value = [
