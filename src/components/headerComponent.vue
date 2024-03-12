@@ -75,6 +75,12 @@ onMounted(() => {
         <RouterLink to="/login" class="text-white">login</RouterLink>
       </button>
     </div>
+    <div v-if="!isLoggedIn" class="nav_item">
+      <button type="button" class="btn btn-primary">
+        <RouterLink to="/signup">Signup</RouterLink>
+      </button>
+    </div>
+    
     <div v-if="isLoggedIn" class="nav_item">
       <button type="button" class="btn btn-primary" @click="logout">Logout</button>
     </div>
