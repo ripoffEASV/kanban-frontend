@@ -2,6 +2,7 @@
 import { onBeforeMount, onMounted, ref } from 'vue'
 import * as GLOBAL from '../components/Globals/GLOBALS.js'
 import OrgItem from '../components/organization_Item.vue'
+import * as Organization from '../components/modules/organizationCRUD.js'
 
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
@@ -28,11 +29,12 @@ interface CurrentOrg {
   orgMembers: []
   projectIDs: []
   inviteArray: []
-  createdByUer: []
+  createdByUser: []
   owner: []
 }
 
 let isShowingModal = ref(false)
+let orgRetrieved = ref(false)
 let isDisabledAddUser = ref(true)
 let inviteArray = ref([] as User[]) // convert User interface to array, to be able to update ref array
 let inputEmail = ref('')
@@ -102,32 +104,9 @@ const addNewOrganization = async () => {
       orgNameValid.value = 'has-error'
       throw new Error('Please input an organization name')
     }
-
-    const bearerToken = 'bearer ' + localStorage.getItem('auth-token')
-
-    await fetch(GLOBAL.URL + 'organizations/addNewOrganization', {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        'content-type': 'application/json',
-        Authorization: bearerToken
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        orgName: inputOrgName.value,
-        createdByID: '',
-        ownerID: '',
-        orgMembers: [],
-        projectIDs: [],
-        inviteArray: JSON.stringify(inviteArray.value)
-      }) // body data type must match "Content-Type" header)
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('added')
-      })
-      .catch((err) => {
-        alert(err.message)
-      })
+    const response = await Organization.addNewOrganization(inputOrgName.value, inviteArray.value)
+    await getOrgs()
+    await toggleModalFalse()
   } catch (error) {
     console.error(error?.message)
   }
@@ -139,71 +118,55 @@ const orgNameCheck = () => {
   }
 }
 
+const loadOrg = async (orgID: string) => {
+  const org: CurrentOrg = await Organization.getSpecificOrg(orgID)
+  console.log(org[0]._id)
+
+  currentOrg.value = [
+    {
+      _id: org[0]._id,
+      orgName: org[0].orgName,
+      createdByID: org[0].createdByID,
+      ownerID: org[0].ownerID,
+      orgMembers: org[0].orgMembers,
+      projectIDs: org[0].projectIDs,
+      inviteArray: org[0].inviteArray,
+      createdByUser: org[0].createdByUser,
+      owner: org[0].owner
+    }
+  ]
+
+  console.log(currentOrg.value)
+  // currentOrg.value.orgName = org.orgName
+  // currentOrg.value.createdByID = org.createdByID
+  // currentOrg.value.ownerID = org.ownerID
+  // currentOrg.value.orgMembers = org.orgMembers
+  // currentOrg.value.projectIDs = org.projectIDs
+  // currentOrg.value.inviteArray = org.inviteArray
+  // currentOrg.value.createdByUser = org.createdByUser
+  // currentOrg.value.owner = org.owner
+
+  orgRetrieved.value = true
+}
+
 const getOrgs = async () => {
-  try {
-    const token = localStorage.getItem('auth-token')
+  const retrievedOrgs = await Organization.getOrgs()
 
-    const response = await fetch(GLOBAL.URL + 'organizations/getOrganizationsFromID', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      credentials: 'include'
+  retrievedOrgs.data.organizations.forEach((org: Org) => {
+    organizationsGet.value.push({
+      _id: org._id,
+      orgName: org.orgName,
+      createdByID: org.createdByID,
+      ownerID: org.ownerID,
+      orgMembers: org.orgMembers,
+      projectIDs: org.projectIDs,
+      inviteArray: org.inviteArray
     })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch organizations: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    data.organizations.forEach((org: Org) => {
-      organizationsGet.value.push({
-        _id: org._id,
-        orgName: org.orgName,
-        createdByID: org.createdByID,
-        ownerID: org.ownerID,
-        orgMembers: org.orgMembers,
-        projectIDs: org.projectIDs,
-        inviteArray: org.inviteArray
-      })
-    })
-  } catch (error) {
-    console.error('error: ', error)
-    // Handle errors, show an alert, or perform other actions as needed.
-  }
+  })
 }
 
-const getSpecificOrg = async (orgID: string) => {
-  try {
-    const token = localStorage.getItem('auth-token')
-
-    const response = await fetch(GLOBAL.URL + 'organizations/getSpecificOrg/' + orgID, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch organizations: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-
-    currentOrg.value = data.org[0]
-
-    console.log(currentOrg.value.orgName)
-  } catch (error) {
-    console.error('error: ', error)
-    // Handle errors, show an alert, or perform other actions as needed.
-  }
-}
-
-onMounted(() => {
-  getOrgs()
+onMounted(async () => {
+  await getOrgs()
 })
 </script>
 
@@ -228,7 +191,7 @@ onMounted(() => {
             <OrgItem
               :org-index="index + 1"
               :org-name="org.orgName"
-              @click="getSpecificOrg(org._id)"
+              @click="loadOrg(org._id)"
             ></OrgItem>
           </div>
         </OverlayScrollbarsComponent>
@@ -236,13 +199,15 @@ onMounted(() => {
     </div>
     <div class="organizations_grid_2 h-100 overflow-hidden">
       <div class="d-flex flex-column px-2 py-1">
-        <div class="d-flex flex-row ms" v-if="currentOrg != null">
-          <h2>{{ currentOrg.orgName }}</h2>
+        <div class="d-flex flex-row ms" v-if="orgRetrieved">
+          <h2>{{ currentOrg[0].orgName }}</h2>
           <div class="d-flex flex-column ms-auto">
-            <span>Owner: {{ currentOrg.owner[0].fName }} {{ currentOrg.owner[0].lName }}</span>
             <span
-              >Creator: {{ currentOrg.createdByUser[0].fName }}
-              {{ currentOrg.createdByUser[0].lName }}</span
+              >Owner: {{ currentOrg[0].owner[0].fName }} {{ currentOrg[0].owner[0].lName }}</span
+            >
+            <span
+              >Creator: {{ currentOrg[0].createdByUser[0].fName }}
+              {{ currentOrg[0].createdByUser[0].lName }}</span
             >
           </div>
         </div>
