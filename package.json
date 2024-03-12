@@ -16,6 +16,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "js-cookies": "^1.0.4",
     "overlayscrollbars": "^2.6.0",
     "overlayscrollbars-vue": "^0.5.7",
     "pinia": "^2.1.7",

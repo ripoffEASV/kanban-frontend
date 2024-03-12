@@ -20,13 +20,27 @@ interface Org {
   inviteArray: []
 }
 
+interface CurrentOrg {
+  _id: String
+  orgName: String
+  createdByID: String
+  ownerID: String
+  orgMembers: []
+  projectIDs: []
+  inviteArray: []
+  createdByUer: []
+  owner: []
+}
+
 let isShowingModal = ref(false)
 let isDisabledAddUser = ref(true)
 let inviteArray = ref([] as User[]) // convert User interface to array, to be able to update ref array
 let inputEmail = ref('')
 let inputOrgName = ref('')
 let orgNameValid = ref('')
-//let organizations = ref([] as Org[]) // use this for later when the backend works...
+let organizationsGet = ref([] as Org[]) // use this for later when the backend works...
+let currentOrg = ref([] as CurrentOrg[])
+
 let organizations = ref([
   { orgIndex: 1, orgName: 'Tech Innovators Inc.' },
   { orgIndex: 2, orgName: 'Global Solutions Group International' },
@@ -129,10 +143,11 @@ const getOrgs = async () => {
   try {
     const token = localStorage.getItem('auth-token')
 
-    const response = await fetch(GLOBAL.URL + 'organizations/getOrganizationsFromID/' + token, {
+    const response = await fetch(GLOBAL.URL + 'organizations/getOrganizationsFromID', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       credentials: 'include'
     })
@@ -142,7 +157,45 @@ const getOrgs = async () => {
     }
 
     const data = await response.json()
-    console.log(data)
+    data.organizations.forEach((org: Org) => {
+      organizationsGet.value.push({
+        _id: org._id,
+        orgName: org.orgName,
+        createdByID: org.createdByID,
+        ownerID: org.ownerID,
+        orgMembers: org.orgMembers,
+        projectIDs: org.projectIDs,
+        inviteArray: org.inviteArray
+      })
+    })
+  } catch (error) {
+    console.error('error: ', error)
+    // Handle errors, show an alert, or perform other actions as needed.
+  }
+}
+
+const getSpecificOrg = async (orgID: string) => {
+  try {
+    const token = localStorage.getItem('auth-token')
+
+    const response = await fetch(GLOBAL.URL + 'organizations/getSpecificOrg/' + orgID, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch organizations: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+
+    currentOrg.value = data.org[0]
+
+    console.log(currentOrg.value.orgName)
   } catch (error) {
     console.error('error: ', error)
     // Handle errors, show an alert, or perform other actions as needed.
@@ -150,8 +203,7 @@ const getOrgs = async () => {
 }
 
 onMounted(() => {
-  //getOrgs()
-  console.log(GLOBAL.URL)
+  getOrgs()
 })
 </script>
 
@@ -172,13 +224,30 @@ onMounted(() => {
         <OverlayScrollbarsComponent
           class="org_scroll_container d-flex flex-column overflow-auto h-100"
         >
-          <div v-for="org in organizations" :key="org.orgIndex">
-            <OrgItem :org-index="org.orgIndex" :org-name="org.orgName"></OrgItem>
+          <div v-for="(org, index) in organizationsGet" :key="org._id">
+            <OrgItem
+              :org-index="index + 1"
+              :org-name="org.orgName"
+              @click="getSpecificOrg(org._id)"
+            ></OrgItem>
           </div>
         </OverlayScrollbarsComponent>
       </div>
     </div>
-    <div class="organizations_grid_2"></div>
+    <div class="organizations_grid_2 h-100 overflow-hidden">
+      <div class="d-flex flex-column px-2 py-1">
+        <div class="d-flex flex-row ms" v-if="currentOrg != null">
+          <h2>{{ currentOrg.orgName }}</h2>
+          <div class="d-flex flex-column ms-auto">
+            <span>Owner: {{ currentOrg.owner[0].fName }} {{ currentOrg.owner[0].lName }}</span>
+            <span
+              >Creator: {{ currentOrg.createdByUser[0].fName }}
+              {{ currentOrg.createdByUser[0].lName }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div

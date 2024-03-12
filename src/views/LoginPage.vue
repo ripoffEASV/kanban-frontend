@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import * as GLOBAL from '../components/Globals/GLOBALS.js'
+import Cookies from 'js-cookies'
 
 const email = ref()
 const password = ref()
@@ -20,12 +21,15 @@ async function login() {
       headers: {
         'content-type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify(data) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
       .then((data) => {
         console.log(data)
+        console.log(data.cookie)
         let token = data.data
+
         localStorage.setItem('auth-token', '')
         localStorage.setItem('auth-token', token.data)
       })
@@ -35,6 +39,20 @@ async function login() {
   } catch (error) {
     console.error(error.message)
   }
+}
+
+function getCookie(name: string) {
+  const cookies = document.cookie.split(';')
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim()
+    // Check if the cookie starts with the specified name
+    if (cookie.startsWith(name + '=')) {
+      // Return the cookie value
+      return cookie.substring(name.length + 1)
+    }
+  }
+  // Return null if the cookie is not found
+  return null
 }
 </script>
 
