@@ -72,7 +72,7 @@ export const getSpecificOrg = async (orgID) => {
     }
 
     const data = await response.json()
-    return data.org
+    return data.org[0]
   } catch (error) {
     //   console.error('error: ', error)
 
