@@ -7,6 +7,7 @@ import * as Organization from '../components/modules/organizationCRUD.js'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import userAvatar from '@/components/userAvatar.vue'
+import projectCard from '@/components/projectCardComponent.vue'
 
 interface User {
   email: String
@@ -52,7 +53,7 @@ const projects = [
     projectID: 1,
     projectName: 'Project Alpha',
     projectStateIDs: [101, 102, 103],
-    invitesArray: [
+    inviteArray: [
       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() }
@@ -62,7 +63,7 @@ const projects = [
     projectID: 2,
     projectName: 'Project Beta',
     projectStateIDs: [104, 105, 106],
-    invitesArray: [
+    inviteArray: [
       { email: 'user4@example.com', fName: 'Alice', lName: 'Johnson', color: getRandomColor() },
       { email: 'user5@example.com', fName: 'Charlie', lName: 'Brown', color: getRandomColor() },
       { email: 'user6@example.com', fName: 'Eva', lName: 'White', color: getRandomColor() }
@@ -72,7 +73,7 @@ const projects = [
     projectID: 3,
     projectName: 'Project Gamma',
     projectStateIDs: [107, 108, 109],
-    invitesArray: [
+    inviteArray: [
       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
@@ -111,7 +112,7 @@ const projects = [
     projectID: 4,
     projectName: 'Project Delta',
     projectStateIDs: [110, 111, 112],
-    invitesArray: [
+    inviteArray: [
       { email: 'user10@example.com', fName: 'Helen', lName: 'Johnson', color: getRandomColor() },
       { email: 'user11@example.com', fName: 'Ivan', lName: 'Garcia', color: getRandomColor() },
       { email: 'user12@example.com', fName: 'Jessica', lName: 'Smith', color: getRandomColor() }
@@ -121,7 +122,7 @@ const projects = [
     projectID: 5,
     projectName: 'Project Epsilon',
     projectStateIDs: [113, 114, 115],
-    invitesArray: [
+    inviteArray: [
       { email: 'user13@example.com', fName: 'Kate', lName: 'Taylor', color: getRandomColor() },
       { email: 'user14@example.com', fName: 'Leo', lName: 'Martinez', color: getRandomColor() },
       { email: 'user15@example.com', fName: 'Mia', lName: 'Johnson', color: getRandomColor() }
@@ -131,7 +132,7 @@ const projects = [
     projectID: 6,
     projectName: 'Project Zeta',
     projectStateIDs: [116, 117, 118],
-    invitesArray: [
+    inviteArray: [
       { email: 'user16@example.com', fName: 'Noah', lName: 'Brown', color: getRandomColor() },
       { email: 'user17@example.com', fName: 'Olivia', lName: 'Garcia', color: getRandomColor() },
       { email: 'user18@example.com', fName: 'Peter', lName: 'Miller', color: getRandomColor() }
@@ -141,7 +142,7 @@ const projects = [
     projectID: 7,
     projectName: 'Project Eta',
     projectStateIDs: [119, 120, 121],
-    invitesArray: [
+    inviteArray: [
       { email: 'user19@example.com', fName: 'Quinn', lName: 'White', color: getRandomColor() },
       { email: 'user20@example.com', fName: 'Ryan', lName: 'Smith', color: getRandomColor() },
       { email: 'user21@example.com', fName: 'Sofia', lName: 'Johnson', color: getRandomColor() }
@@ -151,7 +152,7 @@ const projects = [
     projectID: 8,
     projectName: 'Project Theta',
     projectStateIDs: [122, 123, 124],
-    invitesArray: [
+    inviteArray: [
       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() }
@@ -161,7 +162,7 @@ const projects = [
     projectID: 9,
     projectName: 'Project Iota',
     projectStateIDs: [125, 126, 127],
-    invitesArray: [
+    inviteArray: [
       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() }
@@ -171,7 +172,7 @@ const projects = [
     projectID: 10,
     projectName: 'Project Kappa',
     projectStateIDs: [128, 129, 130],
-    invitesArray: [
+    inviteArray: [
       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
@@ -352,9 +353,9 @@ onMounted(async () => {
 
           <div class="d-flex flex-column flex-lg-row">
             <h2 class="my-auto px-2 mx-2">{{ currentOrg[0].orgName }}</h2>
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column ms-auto">
               <div class="d-flex flex-row py-1">
-                <span class="me-1 my-auto">Owner:</span>
+                <span class="me-1 my-auto org_member_title_span">Owner:</span>
                 <userAvatar
                   :f-name="currentOrg[0].owner[0].fName"
                   :l-name="currentOrg[0].owner[0].lName"
@@ -366,7 +367,7 @@ onMounted(async () => {
               </div>
 
               <div class="d-flex flex-row py-1">
-                <span class="me-1 my-auto">Creator:</span>
+                <span class="me-1 my-auto org_member_title_span">Creator:</span>
                 <userAvatar
                   :f-name="currentOrg[0].createdByUser[0].fName"
                   :l-name="currentOrg[0].createdByUser[0].lName"
@@ -381,32 +382,13 @@ onMounted(async () => {
           </div>
         </div>
         <OverlayScrollbarsComponent class="d-flex flex-row justify-content-center h-100 pe-2">
-          <div class="projects_container" v-if="orgRetrieved">
+          <div class="projects_container position-relative" v-if="orgRetrieved">
             <div v-for="project in projects">
-              <div class="project_card">
-                <div class="d-flex flex-row project_card_header">
-                  <h3>{{ project.projectName }}</h3>
-                </div>
-                <div class="project_card_footer">
-                  <div class="d-flex flex-column">
-                    <span>Members:</span>
-                    <OverlayScrollbarsComponent class="members_container">
-                      <div
-                        class="members_scrollable_container"
-                        v-for="user in project.invitesArray"
-                      >
-                        <userAvatar
-                          class="mx-1 my-1"
-                          :fName="user.fName"
-                          :lName="user.lName"
-                          :color="user.color"
-                        >
-                        </userAvatar>
-                      </div>
-                    </OverlayScrollbarsComponent>
-                  </div>
-                </div>
-              </div>
+              <projectCard :project="project"></projectCard>
+            </div>
+
+            <div class="add_project_div clickable">
+              <i class="bi bi-plus-lg"></i>
             </div>
           </div>
         </OverlayScrollbarsComponent>

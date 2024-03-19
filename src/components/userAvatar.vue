@@ -17,8 +17,8 @@ const props = defineProps({
 
 const fullName = props.fName + ' ' + props.lName
 
-const getInitials = (name: string) => {
-  return name.substring(0, 1)
+const getInitials = (name: String) => {
+  return name.substring(0, 1).toUpperCase()
 }
 </script>
 

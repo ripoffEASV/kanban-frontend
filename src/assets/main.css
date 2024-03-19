@@ -207,7 +207,7 @@
 
 .projects_container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
   grid-gap: 1rem;
   /* Optional: Add some gap between cards */
   max-width: 180rem;
@@ -253,4 +253,28 @@
   flex-direction: row !important;
   flex-wrap: wrap !important;
   display: flex;
+}
+
+.org_member_title_span{
+  width: 4rem;
+}
+
+.add_project_div{
+  width: 50px;
+  height: 50px;
+  background-color: green;
+  border-radius: 50%;
+  position: fixed;
+  bottom: 5%;
+  right: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.add_project_div i{
+  font: 2.5em sans-serif;
+  color: white;
+  line-height: 0px;
 }
