@@ -8,6 +8,7 @@ import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import userAvatar from '@/components/userAvatar.vue'
 import projectCard from '@/components/projectCardComponent.vue'
+import i_singleUser from '../interfaces/i_singleUser.js'
 
 interface User {
   email: String
@@ -33,6 +34,7 @@ interface CurrentOrg {
   inviteArray: []
   createdByUser: []
   owner: []
+  orgUsers: []
 }
 
 const isShowingModal = ref(false)
@@ -45,6 +47,10 @@ const orgNameValid = ref('')
 const organizationsGet = ref([] as Org[]) // use this for later when the backend works...
 const currentOrg = ref([] as CurrentOrg[])
 const isShowingOrgChangeModal = ref(false)
+const isShowingNewProjectModal = ref(false)
+const projectBoards: any = ref([])
+const tempProjectBoardName = ref('')
+const projectMembers = ref([] as User[])
 
 const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
 
@@ -224,6 +230,14 @@ const toggleModalFalse = () => {
   isShowingModal.value = false
 }
 
+const toggleisShowingNewProjectModal = () => {
+  isShowingNewProjectModal.value = !isShowingNewProjectModal.value
+}
+
+const toggleFalseisShowingNewProjectModal = () => {
+  isShowingNewProjectModal.value = false
+}
+
 const addUserToInvite = (inviteEmail: String) => {
   const user: User = {
     email: inviteEmail
@@ -280,7 +294,8 @@ const loadOrg = async (orgID: string) => {
       projectIDs: org.projectIDs,
       inviteArray: org.inviteArray,
       createdByUser: org.createdByUser,
-      owner: org.owner
+      owner: org.owner,
+      members: org.orgUsers
     }
   ]
 
@@ -309,6 +324,38 @@ const toggleOrgSettingsModal = () => {
 
 const toggleFalseSettingsModal = () => {
   isShowingOrgChangeModal.value = false
+}
+
+const addNewProject = () => {}
+
+const addProjectBoard = (title: String) => {
+  projectBoards.value.push({
+    title: title
+  })
+  tempProjectBoardName.value = ''
+}
+
+const deleteProjectBoard = (index: number) => {
+  projectBoards.value.splice(index, 1)
+}
+
+function startDrag(event: Event, user: User) {
+  console.log('drag started')
+  console.log(event.target)
+}
+
+function endDrop(event: Event, user: User) {
+  console.log('drag dropped')
+  console.log(event.target)
+}
+
+const memberDragStart = (event: Event) => {
+  console.log('drag started')
+  console.log(event.target)
+}
+
+const memberDragDrop = (event) => {
+  console.log('dragging dropped')
 }
 
 onMounted(async () => {
@@ -387,9 +434,10 @@ onMounted(async () => {
               <projectCard :project="project"></projectCard>
             </div>
 
-            <div class="add_project_div clickable">
+            <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable">
               <i class="bi bi-plus-lg"></i>
-            </div>
+              <i class="bi bi-pencil-fill"></i>
+            </button>
           </div>
         </OverlayScrollbarsComponent>
       </div>
@@ -600,6 +648,113 @@ onMounted(async () => {
           </button>
           <button type="button" v-on:click="addNewOrganization" class="btn btn-primary">
             Update Organization
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    v-if="orgRetrieved"
+    class="modal fade newProjectModal"
+    :class="{ show: isShowingNewProjectModal }"
+    tabindex="-1"
+    aria-labelledby="changeOrganizationSettingsModal"
+  >
+    <div class="modal-dialog my-auto px-3">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title pe-3 text-dark">New Project</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            v-on:click="toggleisShowingNewProjectModal"
+          ></button>
+        </div>
+        <div class="modal-body d-flex flex-column">
+          <div class="modal_flex_item py-1">
+            <div class="modal_flex_item_title">
+              <span class="text-dark">Project Name</span>
+            </div>
+            <div class="modal_flex_item flex-row">
+              <input type="text" class="form-control" />
+            </div>
+          </div>
+
+          <div class="modal_flex_item py-1">
+            <div class="modal_flex_item_title">
+              <span class="text-dark">Project Boards</span>
+            </div>
+            <div class="modal_flex_item">
+              <div v-for="(project, index) in projectBoards" :key="index">
+                <div class="d-flex flex-row py-1">
+                  <span class="w-100 text-dark">{{ index + 1 }}: {{ project.title }}</span>
+                  <button
+                    type="button"
+                    @click="deleteProjectBoard(index)"
+                    class="btn btn-danger px-2 py-0"
+                  >
+                    x
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal_flex_item flex-row">
+              <input type="text" v-model="tempProjectBoardName" class="form-control" />
+              <button
+                type="button"
+                @click="addProjectBoard(tempProjectBoardName)"
+                class="btn btn-primary mx-1"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div class="modal_flex_item py-1">
+            <div class="modal_flex_item_title">
+              <span class="text-dark">Project members</span>
+            </div>
+            <div class="modal_flex_item flex-row">
+              <div class="dragMemberContainer px-1 py-1">
+                <div
+                  class="avatarContainer"
+                  :draggable="true"
+                  v-for="member in currentOrg[0].members"
+                  @dragstart="startDrag($event, member)"
+                >
+                  <userAvatar
+                    :fName="member.fName"
+                    :lName="member.lName"
+                    :color="member.color"
+                  ></userAvatar>
+                </div>
+              </div>
+
+              <div
+                class="dragMemberContainer px-1"
+                :draggable="true"
+                @dragstart="startDrag($event)"
+                @drop="endDrop($event)"
+                @dragover.prevent
+                @dragenter.prevent
+                v-for="member in projectMembers"
+              ></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            v-on:click="toggleFalseisShowingNewProjectModal"
+            class="btn btn-secondary"
+          >
+            Close
+          </button>
+          <button type="button" v-on:click="addNewProject" class="btn btn-primary">
+            Add Project
           </button>
         </div>
       </div>

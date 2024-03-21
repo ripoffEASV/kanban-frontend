@@ -278,3 +278,48 @@
   color: white;
   line-height: 0px;
 }
+
+.add_project_div .bi-pencil-fill{
+  font-size: 1.5rem;
+  display: none;
+}
+
+.add_project_div:hover .bi-plus-lg{
+  display: none;
+}
+
+.add_project_div:hover .bi-pencil-fill{
+  display: flex;
+}
+
+.newProjectModal.show {
+  display: flex;
+  background-color: #000000b0;
+}
+
+.dragMemberContainer{
+  border: 1px solid #CACACA;
+  width: 100%;
+  min-width: 49%;
+  margin: 0.25rem;
+  height: 12.5rem;
+  border-radius: 8px;
+  flex-direction: row;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+}
+
+.dragMemberContainer .avatarContainer{
+  width: 30px;
+  height: 30px;
+}
+
+.dragMemberContainer .avatarContainer:hover{
+  cursor: grab;
+}
+
+.dragMemberContainer .avatarContainer.grab{
+  cursor: grabbing;
+}
