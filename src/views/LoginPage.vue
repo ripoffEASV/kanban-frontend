@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import * as Login from '../components/modules/loginCRUD.js'
+import userCrud from '../components/modules/loginCRUD';
+
+const { loginUser } = userCrud();
 
 const email = ref('')
 const password = ref('')
 
 const login = async () => {
-  await Login.loginUser(email.value, password.value)
+  await loginUser(email.value, password.value)
 }
 </script>
 

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import userCrud from './modules/loginCRUD'
+
+const { signUpUser } = userCrud();
 
 // Reactive state
 const formData = ref({
@@ -11,8 +14,9 @@ const formData = ref({
 // Method
 function submitForm() {
   // Here you would handle the form submission, e.g., validate input and send it to a server
-  console.log('Form submitted:', formData.value);
-  alert('Signup successful!');
+  signUpUser(formData.value.name, formData.value.email, formData.value.password);
+  /* console.log('Form submitted:', formData.value);
+  alert('Signup successful!'); */
 }
 </script>
 
