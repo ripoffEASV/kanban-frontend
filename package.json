@@ -16,6 +16,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "bootstrap-icons": "^1.11.3",
     "js-cookies": "^1.0.4",
     "overlayscrollbars": "^2.6.0",
     "overlayscrollbars-vue": "^0.5.7",
