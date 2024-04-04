@@ -20,7 +20,7 @@ const formData = ref({
 
 // Method
 function submitForm() {
-  signUpUser(formData.value.username, formData.value.email, formData.value.password);
+  signUpUser(formData.value.firstName, formData.value.lastName, formData.value.username, formData.value.email, formData.value.password);
 }
 
 const showPassword = ref({
@@ -58,7 +58,7 @@ const togglePasswordVisibility = (fieldName) => {
       <div class="form-group">
         <label for="password">Password:</label>
         <section class="d-flex flex-row position-relative">
-          <input autocomplete="new-password" :type="showPassword.password  ? 'text' : 'password'" id="password" v-model="formData.password" required minlength="6">
+          <input autocomplete="new-password" :type="showPassword.password  ? 'text' : 'password'" id="password" v-model="formData.password" required minlength="3">
           <div class="position-absolute eyePos" type="button" @click="togglePasswordVisibility('password')">
             <i :class="showPassword.password ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'" class="text-black"></i>
           </div>
@@ -67,7 +67,7 @@ const togglePasswordVisibility = (fieldName) => {
       <div class="form-group position-relative">
         <label for="newPassword">Confirm password:</label>
         <section class="d-flex flex-row position-relative">
-          <input autocomplete="new-password" :type="showPassword.confirmPassword ? 'text' : 'password'" id="newPassword" v-model="formData.repeatPassword" required minlength="6">
+          <input autocomplete="new-password" :type="showPassword.confirmPassword ? 'text' : 'password'" id="newPassword" v-model="formData.repeatPassword" required minlength="3">
           <div class="position-absolute eyePos" type="button" @click="togglePasswordVisibility('confirmPassword')">
             <i :class="showPassword.confirmPassword ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'" class="text-black"></i>
           </div>

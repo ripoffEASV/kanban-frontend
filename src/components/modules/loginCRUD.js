@@ -2,10 +2,10 @@ import * as GLOBAL from '../Globals/GLOBALS'
 
 export default function userCrud() {
 
-  const loginUser = async (email, password) => {
+  const loginUser = async (emailOrUsername, password) => {
     try {
       const data = {
-        email: email,
+        emailOrUsername,
         password: password
       }
 
@@ -25,22 +25,24 @@ export default function userCrud() {
           localStorage.setItem('auth-token', token.data)
         })
         .catch((err) => {
-          alert(err.message)
+          alert(err)
         })
     } catch (error) {
-      console.error(error.message)
+      console.error(error)
     }
   }
 
-  const signUpUser = async (name, email, password) => {
+  const signUpUser = async (fname, lname, username, email, password) => {
     try {
       const user = {
-        name: name,
-        email: email,
-        password: password
+        fName: fname,
+        lName: lname,
+        username,
+        email,
+        password
       }
   
-      await fetch(GLOBAL.URL + 'users/addUser', {
+      await fetch(GLOBAL.URL + 'users/register', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'

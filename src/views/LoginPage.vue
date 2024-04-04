@@ -16,10 +16,10 @@ const login = async () => {
   <div class="loginContainer my-auto mx-auto px-5 py-5 border rounded my-auto d-flex flex-column">
     <div class="d-flex flex-column">
       <div class="d-flex flex-row py-2">
-        <span>Email</span>
+        <span>Email/Username</span>
       </div>
       <div class="d-flex flex-row">
-        <input type="email" v-model="email" class="form-control" />
+        <input type="text" v-model="email" class="form-control" />
       </div>
     </div>
 
