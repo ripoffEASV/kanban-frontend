@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref } from 'vue'
+import { onBeforeMount, onMounted, ref, reactive } from 'vue'
 import * as GLOBAL from '../components/Globals/GLOBALS.js'
 import OrgItem from '../components/organization_Item.vue'
 import * as Organization from '../components/modules/organizationCRUD.js'
@@ -48,9 +48,10 @@ const organizationsGet = ref([] as Org[]) // use this for later when the backend
 const currentOrg = ref([] as CurrentOrg[])
 const isShowingOrgChangeModal = ref(false)
 const isShowingNewProjectModal = ref(false)
-const projectBoards: any = ref([])
+const projectBoards: any = reactive({boards:new Array()})
 const tempProjectBoardName = ref('')
-const projectMembers = ref([] as User[])
+const projectMembers: i_singleUser = reactive({member: new Array()})
+const inputProjectName = ref()
 
 const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
 
@@ -267,7 +268,6 @@ const addNewOrganization = async () => {
       orgNameValid.value = 'has-error'
       throw new Error('Please input an organization name')
     }
-    const response = await Organization.addNewOrganization(inputOrgName.value, inviteArray.value)
     await getOrgs()
     await toggleModalFalse()
   } catch (error) {
@@ -326,12 +326,8 @@ const toggleFalseSettingsModal = () => {
   isShowingOrgChangeModal.value = false
 }
 
-const addNewProject = () => {}
-
 const addProjectBoard = (title: String) => {
-  projectBoards.value.push({
-    title: title
-  })
+  projectBoards.boards.push({title: title})
   tempProjectBoardName.value = ''
 }
 
@@ -339,23 +335,41 @@ const deleteProjectBoard = (index: number) => {
   projectBoards.value.splice(index, 1)
 }
 
-function startDrag(event: Event, user: User) {
+function startDrag(event: DragEvent, user: i_singleUser) {
   console.log('drag started')
-  console.log(event.target)
+  console.log("Dragged Target: ", event.target)
+  console.log(user)
+  event.dataTransfer?.setData("userID", user._id)
+  event.dataTransfer?.setData("user_fName", user.fName)
+  event.dataTransfer?.setData("user_lName", user.lName)
+  event.dataTransfer?.setData("user_color", user.color)
+
+  event.target.className += " hide"
+
 }
 
-function endDrop(event: Event, user: User) {
-  console.log('drag dropped')
-  console.log(event.target)
+function endDrop(event: DragEvent) {
+  console.log('drag dropped: ', event.target)
+
+
+  const user: i_singleUser = {
+    _id:event.dataTransfer?.getData("userID"),
+    fName: event.dataTransfer?.getData("user_fName"),
+    lName: event.dataTransfer?.getData("user_lName"),
+    color: event.dataTransfer?.getData("user_color")
+
+  }
+  console.log(user)
+  projectMembers.member.push(user)
 }
 
-const memberDragStart = (event: Event) => {
-  console.log('drag started')
-  console.log(event.target)
-}
+function addNewProject(){
 
-const memberDragDrop = (event) => {
-  console.log('dragging dropped')
+  const boards = projectBoards.boards
+  const members = projectMembers.member
+
+  Organization.addNewProject(inputProjectName.value, boards, members, currentOrg.value[0]._id)
+
 }
 
 onMounted(async () => {
@@ -679,7 +693,7 @@ onMounted(async () => {
               <span class="text-dark">Project Name</span>
             </div>
             <div class="modal_flex_item flex-row">
-              <input type="text" class="form-control" />
+              <input type="text" v-model="inputProjectName" class="form-control" />
             </div>
           </div>
 
@@ -688,7 +702,7 @@ onMounted(async () => {
               <span class="text-dark">Project Boards</span>
             </div>
             <div class="modal_flex_item">
-              <div v-for="(project, index) in projectBoards" :key="index">
+              <div v-for="(project, index) in projectBoards.boards" :key="index">
                 <div class="d-flex flex-row py-1">
                   <span class="w-100 text-dark">{{ index + 1 }}: {{ project.title }}</span>
                   <button
@@ -718,12 +732,14 @@ onMounted(async () => {
               <span class="text-dark">Project members</span>
             </div>
             <div class="modal_flex_item flex-row">
-              <div class="dragMemberContainer px-1 py-1">
+              <div class="dragMemberContainer  px-1 py-1">
                 <div
                   class="avatarContainer"
                   :draggable="true"
                   v-for="member in currentOrg[0].members"
+                  :key="member._id"
                   @dragstart="startDrag($event, member)"
+                  
                 >
                   <userAvatar
                     :fName="member.fName"
@@ -736,12 +752,21 @@ onMounted(async () => {
               <div
                 class="dragMemberContainer px-1"
                 :draggable="true"
-                @dragstart="startDrag($event)"
                 @drop="endDrop($event)"
                 @dragover.prevent
                 @dragenter.prevent
-                v-for="member in projectMembers"
-              ></div>
+                >
+                  <div class="avatarContainer"
+                    v-for="member in projectMembers.member"
+                    :key="member._id"
+                    >
+                    <userAvatar
+                    :fName="member.fName"
+                    :lName="member.lName"
+                    :color="member.color"
+                  ></userAvatar>
+                  </div>    
+              </div>
             </div>
           </div>
         </div>
@@ -753,7 +778,7 @@ onMounted(async () => {
           >
             Close
           </button>
-          <button type="button" v-on:click="addNewProject" class="btn btn-primary">
+          <button type="button" v-on:click="addNewProject()" class="btn btn-primary">
             Add Project
           </button>
         </div>

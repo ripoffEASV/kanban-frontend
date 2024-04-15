@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type i_project from '@/interfaces/i_project'
 import userAvatar from './userAvatar.vue'
+import { useRouter } from 'vue-router'
 
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+
+const router = useRouter();
 
 const defaultProject: i_project = {
   projectID: -1,
@@ -17,10 +20,23 @@ const props = defineProps<{
   lName: string
   color: string
 }>()
+
+const gotoProject = (projectID: number) =>{
+  console.log("plz")
+
+  router.push({
+    path: "/currentProject",
+    query:{
+      project: projectID
+    }
+  })
+
+}
+
 </script>
 
 <template>
-  <div class="project_card">
+  <div class="project_card" @dblclick="gotoProject(props.project.projectID)" >
     <div class="d-flex flex-row project_card_header">
       <h3>{{ props.project?.projectName }}</h3>
     </div>

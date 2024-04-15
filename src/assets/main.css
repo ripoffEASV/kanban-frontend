@@ -323,3 +323,7 @@
 .dragMemberContainer .avatarContainer.grab{
   cursor: grabbing;
 }
+
+.hide{
+  display: none !important
+}
