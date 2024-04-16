@@ -327,3 +327,8 @@
 .hide{
   display: none !important
 }
+
+.kanban_title:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}

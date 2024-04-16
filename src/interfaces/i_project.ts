@@ -1,7 +1,7 @@
 export default interface Project{
     projectID:number,
     projectName:string,
-    projectStateID?:number,
+    projectStateIDs?:Array<any>[],
     inviteArray?:Array<{
         email: string,
         fName: string,

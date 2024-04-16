@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onBeforeMount, onMounted, ref, reactive } from 'vue'
-import * as GLOBAL from '../components/Globals/GLOBALS.js'
 import OrgItem from '../components/organization_Item.vue'
 import * as Organization from '../components/modules/organizationCRUD.js'
 
@@ -9,6 +8,7 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import userAvatar from '@/components/userAvatar.vue'
 import projectCard from '@/components/projectCardComponent.vue'
 import i_singleUser from '../interfaces/i_singleUser.js'
+import i_project from '../interfaces/i_project.js'
 
 interface User {
   email: String
@@ -48,177 +48,178 @@ const organizationsGet = ref([] as Org[]) // use this for later when the backend
 const currentOrg = ref([] as CurrentOrg[])
 const isShowingOrgChangeModal = ref(false)
 const isShowingNewProjectModal = ref(false)
-const projectBoards: any = reactive({boards:new Array()})
+const projectBoards: any = reactive({ boards: new Array() })
 const tempProjectBoardName = ref('')
-const projectMembers: i_singleUser = reactive({member: new Array()})
+const projectMembers: i_singleUser = reactive({ member: new Array() })
 const inputProjectName = ref()
+const projects = ref([] as i_project[])
 
 const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
 
-const projects = [
-  {
-    projectID: 1,
-    projectName: 'Project Alpha',
-    projectStateIDs: [101, 102, 103],
-    inviteArray: [
-      { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
-      { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
-      { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 2,
-    projectName: 'Project Beta',
-    projectStateIDs: [104, 105, 106],
-    inviteArray: [
-      { email: 'user4@example.com', fName: 'Alice', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user5@example.com', fName: 'Charlie', lName: 'Brown', color: getRandomColor() },
-      { email: 'user6@example.com', fName: 'Eva', lName: 'White', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 3,
-    projectName: 'Project Gamma',
-    projectStateIDs: [107, 108, 109],
-    inviteArray: [
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
-      { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
-      { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
-      { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
-      { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
-      { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
-      { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
-      { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
-      { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user7@example.com', fName: 'David', lName: 'Jones', color: getRandomColor() },
-      { email: 'user8@example.com', fName: 'Grace', lName: 'Smith', color: getRandomColor() },
-      { email: 'user9@example.com', fName: 'Frank', lName: 'Miller', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 4,
-    projectName: 'Project Delta',
-    projectStateIDs: [110, 111, 112],
-    inviteArray: [
-      { email: 'user10@example.com', fName: 'Helen', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user11@example.com', fName: 'Ivan', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user12@example.com', fName: 'Jessica', lName: 'Smith', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 5,
-    projectName: 'Project Epsilon',
-    projectStateIDs: [113, 114, 115],
-    inviteArray: [
-      { email: 'user13@example.com', fName: 'Kate', lName: 'Taylor', color: getRandomColor() },
-      { email: 'user14@example.com', fName: 'Leo', lName: 'Martinez', color: getRandomColor() },
-      { email: 'user15@example.com', fName: 'Mia', lName: 'Johnson', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 6,
-    projectName: 'Project Zeta',
-    projectStateIDs: [116, 117, 118],
-    inviteArray: [
-      { email: 'user16@example.com', fName: 'Noah', lName: 'Brown', color: getRandomColor() },
-      { email: 'user17@example.com', fName: 'Olivia', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user18@example.com', fName: 'Peter', lName: 'Miller', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 7,
-    projectName: 'Project Eta',
-    projectStateIDs: [119, 120, 121],
-    inviteArray: [
-      { email: 'user19@example.com', fName: 'Quinn', lName: 'White', color: getRandomColor() },
-      { email: 'user20@example.com', fName: 'Ryan', lName: 'Smith', color: getRandomColor() },
-      { email: 'user21@example.com', fName: 'Sofia', lName: 'Johnson', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 8,
-    projectName: 'Project Theta',
-    projectStateIDs: [122, 123, 124],
-    inviteArray: [
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 9,
-    projectName: 'Project Iota',
-    projectStateIDs: [125, 126, 127],
-    inviteArray: [
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() }
-    ]
-  },
-  {
-    projectID: 10,
-    projectName: 'Project Kappa',
-    projectStateIDs: [128, 129, 130],
-    inviteArray: [
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
-      { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
-      { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
-      { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
-      { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
-      { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
-      { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
-      { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
-      { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
-      { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
-      { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
-      { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
-      { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
-      { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
-      { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
-      { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
-      { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
-      { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
-      { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
-      { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() }
-    ]
-  }
-]
+// const projects = [
+//   {
+//     projectID: 1,
+//     projectName: 'Project Alpha',
+//     projectStateIDs: [101, 102, 103],
+//     inviteArray: [
+//       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 2,
+//     projectName: 'Project Beta',
+//     projectStateIDs: [104, 105, 106],
+//     inviteArray: [
+//       { email: 'user4@example.com', fName: 'Alice', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user5@example.com', fName: 'Charlie', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user6@example.com', fName: 'Eva', lName: 'White', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 3,
+//     projectName: 'Project Gamma',
+//     projectStateIDs: [107, 108, 109],
+//     inviteArray: [
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user7@example.com', fName: 'David', lName: 'Jones', color: getRandomColor() },
+//       { email: 'user8@example.com', fName: 'Grace', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user9@example.com', fName: 'Frank', lName: 'Miller', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 4,
+//     projectName: 'Project Delta',
+//     projectStateIDs: [110, 111, 112],
+//     inviteArray: [
+//       { email: 'user10@example.com', fName: 'Helen', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user11@example.com', fName: 'Ivan', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user12@example.com', fName: 'Jessica', lName: 'Smith', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 5,
+//     projectName: 'Project Epsilon',
+//     projectStateIDs: [113, 114, 115],
+//     inviteArray: [
+//       { email: 'user13@example.com', fName: 'Kate', lName: 'Taylor', color: getRandomColor() },
+//       { email: 'user14@example.com', fName: 'Leo', lName: 'Martinez', color: getRandomColor() },
+//       { email: 'user15@example.com', fName: 'Mia', lName: 'Johnson', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 6,
+//     projectName: 'Project Zeta',
+//     projectStateIDs: [116, 117, 118],
+//     inviteArray: [
+//       { email: 'user16@example.com', fName: 'Noah', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user17@example.com', fName: 'Olivia', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user18@example.com', fName: 'Peter', lName: 'Miller', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 7,
+//     projectName: 'Project Eta',
+//     projectStateIDs: [119, 120, 121],
+//     inviteArray: [
+//       { email: 'user19@example.com', fName: 'Quinn', lName: 'White', color: getRandomColor() },
+//       { email: 'user20@example.com', fName: 'Ryan', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user21@example.com', fName: 'Sofia', lName: 'Johnson', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 8,
+//     projectName: 'Project Theta',
+//     projectStateIDs: [122, 123, 124],
+//     inviteArray: [
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 9,
+//     projectName: 'Project Iota',
+//     projectStateIDs: [125, 126, 127],
+//     inviteArray: [
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() }
+//     ]
+//   },
+//   {
+//     projectID: 10,
+//     projectName: 'Project Kappa',
+//     projectStateIDs: [128, 129, 130],
+//     inviteArray: [
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user22@example.com', fName: 'Tom', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user23@example.com', fName: 'Ursula', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user24@example.com', fName: 'Vincent', lName: 'Miller', color: getRandomColor() },
+//       { email: 'user25@example.com', fName: 'Will', lName: 'White', color: getRandomColor() },
+//       { email: 'user26@example.com', fName: 'Xena', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user27@example.com', fName: 'Yannick', lName: 'Johnson', color: getRandomColor() },
+//       { email: 'user1@example.com', fName: 'John', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user2@example.com', fName: 'Jane', lName: 'Doe', color: getRandomColor() },
+//       { email: 'user3@example.com', fName: 'Bob', lName: 'Smith', color: getRandomColor() },
+//       { email: 'user28@example.com', fName: 'Zoe', lName: 'Brown', color: getRandomColor() },
+//       { email: 'user29@example.com', fName: 'Adam', lName: 'Garcia', color: getRandomColor() },
+//       { email: 'user30@example.com', fName: 'Bella', lName: 'Miller', color: getRandomColor() }
+//     ]
+//   }
+// ]
 
 let regex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
@@ -281,6 +282,27 @@ const orgNameCheck = () => {
   }
 }
 
+const loadProjects = async (orgID: string) => {
+  try {
+    let projectData = await Organization.loadProjects(orgID)
+
+    projects.value = []
+
+    projectData.forEach((element: any) => {
+      projects.value.push({
+        projectID: element._id,
+        projectName: element.projectName,
+        projectStateIDs: element.projectStateIDs,
+        inviteArray: element.membersInfo
+      })
+    })
+
+    console.log(projectData)
+  } catch (error) {
+    console.log('an error occurred, when loading org projects: ', error.message)
+  }
+}
+
 const loadOrg = async (orgID: string) => {
   let org: CurrentOrg[] = await Organization.getSpecificOrg(orgID)
 
@@ -300,6 +322,8 @@ const loadOrg = async (orgID: string) => {
   ]
 
   orgRetrieved.value = true
+
+  await loadProjects(orgID)
 }
 
 const getOrgs = async () => {
@@ -327,7 +351,7 @@ const toggleFalseSettingsModal = () => {
 }
 
 const addProjectBoard = (title: String) => {
-  projectBoards.boards.push({title: title})
+  projectBoards.boards.push({ title: title })
   tempProjectBoardName.value = ''
 }
 
@@ -337,39 +361,34 @@ const deleteProjectBoard = (index: number) => {
 
 function startDrag(event: DragEvent, user: i_singleUser) {
   console.log('drag started')
-  console.log("Dragged Target: ", event.target)
+  console.log('Dragged Target: ', event.target)
   console.log(user)
-  event.dataTransfer?.setData("userID", user._id)
-  event.dataTransfer?.setData("user_fName", user.fName)
-  event.dataTransfer?.setData("user_lName", user.lName)
-  event.dataTransfer?.setData("user_color", user.color)
+  event.dataTransfer?.setData('userID', user._id)
+  event.dataTransfer?.setData('user_fName', user.fName)
+  event.dataTransfer?.setData('user_lName', user.lName)
+  event.dataTransfer?.setData('user_color', user.color)
 
-  event.target.className += " hide"
-
+  event.target.className += ' hide'
 }
 
 function endDrop(event: DragEvent) {
   console.log('drag dropped: ', event.target)
 
-
   const user: i_singleUser = {
-    _id:event.dataTransfer?.getData("userID"),
-    fName: event.dataTransfer?.getData("user_fName"),
-    lName: event.dataTransfer?.getData("user_lName"),
-    color: event.dataTransfer?.getData("user_color")
-
+    _id: event.dataTransfer?.getData('userID'),
+    fName: event.dataTransfer?.getData('user_fName'),
+    lName: event.dataTransfer?.getData('user_lName'),
+    color: event.dataTransfer?.getData('user_color')
   }
   console.log(user)
   projectMembers.member.push(user)
 }
 
-function addNewProject(){
-
+function addNewProject() {
   const boards = projectBoards.boards
   const members = projectMembers.member
 
   Organization.addNewProject(inputProjectName.value, boards, members, currentOrg.value[0]._id)
-
 }
 
 onMounted(async () => {
@@ -394,7 +413,7 @@ onMounted(async () => {
         <OverlayScrollbarsComponent
           class="org_scroll_container d-flex flex-column overflow-auto h-100"
         >
-          <div v-for="(org, index) in organizationsGet" :key="org._id">
+          <div v-for="(org, index) in organizationsGet" :key="index">
             <OrgItem
               :org-index="index + 1"
               :org-name="org.orgName"
@@ -732,14 +751,13 @@ onMounted(async () => {
               <span class="text-dark">Project members</span>
             </div>
             <div class="modal_flex_item flex-row">
-              <div class="dragMemberContainer  px-1 py-1">
+              <div class="dragMemberContainer px-1 py-1">
                 <div
                   class="avatarContainer"
                   :draggable="true"
                   v-for="member in currentOrg[0].members"
                   :key="member._id"
                   @dragstart="startDrag($event, member)"
-                  
                 >
                   <userAvatar
                     :fName="member.fName"
@@ -755,17 +773,18 @@ onMounted(async () => {
                 @drop="endDrop($event)"
                 @dragover.prevent
                 @dragenter.prevent
+              >
+                <div
+                  class="avatarContainer"
+                  v-for="member in projectMembers.member"
+                  :key="member._id"
                 >
-                  <div class="avatarContainer"
-                    v-for="member in projectMembers.member"
-                    :key="member._id"
-                    >
-                    <userAvatar
+                  <userAvatar
                     :fName="member.fName"
                     :lName="member.lName"
                     :color="member.color"
                   ></userAvatar>
-                  </div>    
+                </div>
               </div>
             </div>
           </div>

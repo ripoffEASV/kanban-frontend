@@ -7,13 +7,6 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
 const router = useRouter();
 
-const defaultProject: i_project = {
-  projectID: -1,
-  projectName: '',
-  projectStateID: -1,
-  inviteArray: []
-}
-
 const props = defineProps<{
   project: i_project
   fName: string
@@ -22,7 +15,6 @@ const props = defineProps<{
 }>()
 
 const gotoProject = (projectID: number) =>{
-  console.log("plz")
 
   router.push({
     path: "/currentProject",

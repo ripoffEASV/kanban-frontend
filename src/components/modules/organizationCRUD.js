@@ -79,16 +79,11 @@ export const getSpecificOrg = async (orgID) => {
     return error
     // Handle errors, show an alert, or perform other actions as needed.
   }
-
-  
-
 }
 
-export const addNewProject = async(ProjectName, projectBoards, projectMembers, orgID) =>{
-
-  try{
-
-  const token = localStorage.getItem('auth-token')
+export const addNewProject = async (ProjectName, projectBoards, projectMembers, orgID) => {
+  try {
+    const token = localStorage.getItem('auth-token')
     const projectData = {
       projectName: ProjectName,
       projectBoards: projectBoards,
@@ -109,16 +104,23 @@ export const addNewProject = async(ProjectName, projectBoards, projectMembers, o
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("request completed!: ", data)
+        console.log('request completed!: ', data)
       })
       .catch((err) => {
         alert(err.message)
       })
 
-
     //console.log(data)
-  } catch(error){
+  } catch (error) {
     console.log(error)
   }
+}
 
+export const loadProjects = async (orgID) => {
+  try {
+    const projects = await fetch(GLOBAL.URL + 'projects/getProjects/' + orgID)
+    return await projects.json()
+  } catch (error) {
+    console.log(error)
+  }
 }
