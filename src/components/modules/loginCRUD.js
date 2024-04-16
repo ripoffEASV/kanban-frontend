@@ -5,35 +5,35 @@ export default function userCrud() {
 
   const loginUser = async (emailOrUsername, password) => {
     try {
-      const loggedIn = ref(false);
       const data = {
         emailOrUsername,
         password: password
       }
 
-      await fetch(GLOBAL.URL + 'users/login', {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      const response = await fetch(GLOBAL.URL + 'users/login', {
+        method: 'POST',
         headers: {
           'content-type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify(data) // body data type must match "Content-Type" header)
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          let token = data.data
-          loggedIn.value = true
+        body: JSON.stringify(data)
+      });
 
-          localStorage.setItem('auth-token', '')
-          localStorage.setItem('auth-token', token.data);
-          return loggedIn.value;
-        })
-        .catch((err) => {
-          alert(err)
-          return loggedIn.value;
-        })
+        if (!response.ok) {
+          throw new Error('Login failed!');
+        }
+
+        const result = await response.json();
+        if (result && result.data && result.data.token) {
+          localStorage.setItem('auth-token', result.data.token);
+          return true;
+        } else {
+          return false;
+        }
+
     } catch (error) {
       console.error(error)
+      return false;
     }
   }
 

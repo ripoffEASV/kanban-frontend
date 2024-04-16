@@ -12,10 +12,11 @@ const router = useRouter();
 
 const login = async () => {
 
-  loggedIn.value = await loginUser(email.value, password.value)
-  if(loggedIn.value){
-    router.push("/organizations")
-  }
+  await loginUser(email.value, password.value).then((success: any) => {
+    if(success) {
+      router.push("/organizations")
+    }
+  })
 }
 </script>
 
