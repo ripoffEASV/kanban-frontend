@@ -72,11 +72,55 @@ export const getSpecificOrg = async (orgID) => {
     }
 
     const data = await response.json()
-    return data.org
+    return data.org[0]
   } catch (error) {
     //   console.error('error: ', error)
 
     return error
     // Handle errors, show an alert, or perform other actions as needed.
+  }
+}
+
+export const addNewProject = async (ProjectName, projectBoards, projectMembers, orgID) => {
+  try {
+    const token = localStorage.getItem('auth-token')
+    const projectData = {
+      projectName: ProjectName,
+      projectBoards: projectBoards,
+      projectMembers: projectMembers,
+      orgID: orgID
+    }
+
+    console.log(projectData)
+
+    await fetch(GLOBAL.URL + 'projects/addNewProject', {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      credentials: 'include',
+      body: JSON.stringify(projectData) // body data type must match "Content-Type" header)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('request completed!: ', data)
+      })
+      .catch((err) => {
+        alert(err.message)
+      })
+
+    //console.log(data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const loadProjects = async (orgID) => {
+  try {
+    const projects = await fetch(GLOBAL.URL + 'projects/getProjects/' + orgID)
+    return await projects.json()
+  } catch (error) {
+    console.log(error)
   }
 }

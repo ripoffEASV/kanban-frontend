@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import userCrud from '../components/modules/loginCRUD';
-
+import { useRouter } from 'vue-router';
 const { loginUser } = userCrud();
+
 
 const email = ref('')
 const password = ref('')
+const loggedIn = ref(false)
+const router = useRouter();
 
 const login = async () => {
-  await loginUser(email.value, password.value)
+
+  loggedIn.value = await loginUser(email.value, password.value)
+  if(loggedIn.value){
+    router.push("/organizations")
+  }
 }
 </script>
 

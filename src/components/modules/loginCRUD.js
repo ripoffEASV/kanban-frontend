@@ -1,9 +1,11 @@
 import * as GLOBAL from '../Globals/GLOBALS'
+import { ref } from 'vue'
 
 export default function userCrud() {
 
   const loginUser = async (emailOrUsername, password) => {
     try {
+      const loggedIn = ref(false);
       const data = {
         emailOrUsername,
         password: password
@@ -20,12 +22,15 @@ export default function userCrud() {
         .then((res) => res.json())
         .then((data) => {
           let token = data.data
+          loggedIn.value = true
 
           localStorage.setItem('auth-token', '')
-          localStorage.setItem('auth-token', token.data)
+          localStorage.setItem('auth-token', token.data);
+          return loggedIn.value;
         })
         .catch((err) => {
           alert(err)
+          return loggedIn.value;
         })
     } catch (error) {
       console.error(error)
