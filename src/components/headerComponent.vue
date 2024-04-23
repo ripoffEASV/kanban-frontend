@@ -76,15 +76,23 @@ onMounted(() => {
       </button>
     </div>
     <div v-if="!isLoggedIn" class="nav_item">
-      <button type="button" class="btn btn-primary">
+      <button type="button" class="btn btn-primary btn_singup">
         <RouterLink to="/signup">Signup</RouterLink>
       </button>
     </div>
-    
+
     <div v-if="isLoggedIn" class="nav_item">
-      <button type="button" class="btn btn-primary" @click="logout">Logout</button>
+      <button type="button" class="btn btn-primary btn_logout" style="color: white" @click="logout">
+        Logout
+      </button>
     </div>
 
     <!-- <RouterLink to="/about">About</RouterLink> -->
   </nav>
 </template>
+
+<style scoped>
+.btn_singup a {
+  color: white !important;
+}
+</style>
