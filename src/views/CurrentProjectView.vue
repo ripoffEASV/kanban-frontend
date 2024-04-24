@@ -11,19 +11,19 @@
           <!-- Add other Kanban board content here -->
 
           <div class="kanban_task_container" @dragover.prevent @drop="handleDrop(boardIndex)">
-            <!-- <ul>
+            <ul>
               <li
-                v-for="(task, taskIndex) in board.tasks"
+                v-for="(task, taskIndex) in board.taskArray"
                 :key="taskIndex"
                 draggable="true"
                 @dragstart="handleDragStart(boardIndex, taskIndex, $event)"
                 @dragend="handleDragEnd"
                 @dblclick="editTask(boardIndex, taskIndex)"
               >
-                <h4>{{ task.title }}</h4>
-                <p>{{ task.description }}</p>
+                <h4>{{ task.taskTitle }}</h4>
+                <!-- <p>{{ task.description }}</p> -->
               </li>
-            </ul> -->
+            </ul>
           </div>
         </div>
       </div>
@@ -196,14 +196,20 @@ onMounted(async () => {
 
 const loadStates = async (projectID: string) => {
   await projectCRUD.loadStatesFromProjectID(projectID).then(async (data: any) => {
-    console.log(data.project[0].stateInfo)
+    console.log(data.project[0])
 
     await data.project[0].stateInfo.map(async (board: i_state) => {
+      const tempTaskArray = data.project[0].taskArray.filter((task: any) => {
+        return task.stateID == board.stateID
+      })
+
+      console.log('test taskArray: ', tempTaskArray)
+
       kanbanBoards.value.push({
         stateID: board.stateID,
         stateName: board.stateName,
-        taskArray: board.taskArray,
-        position: board.position
+        position: board.position,
+        taskArray: tempTaskArray
       })
     })
   })
@@ -231,14 +237,6 @@ const availableColors = ref([
     hex: '#ffffe0'
   }
 ])
-
-function generateTasks(count: number): Task[] {
-  return Array.from({ length: count }, (_, index) => ({
-    id: index + 1,
-    title: `Task ${index + 1}`,
-    description: `Description for Task ${index + 1}`
-  }))
-}
 
 let dragBoardIndex = -1
 let dragTaskIndex = -1
