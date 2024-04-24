@@ -1,5 +1,7 @@
 import * as GLOBAL from '../Globals/GLOBALS'
 import { ref } from 'vue'
+import { useAuthStore } from '../../stores/authStore';
+const authStore = useAuthStore();
 
 export default function userCrud() {
 
@@ -25,7 +27,7 @@ export default function userCrud() {
 
         const result = await response.json();
         if (result && result.data && result.data.token) {
-          localStorage.setItem('auth-token', result.data.token);
+          authStore.login(result.data.token);
           return true;
         } else {
           return false;

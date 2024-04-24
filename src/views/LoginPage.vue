@@ -14,14 +14,14 @@ const login = async () => {
 
   await loginUser(email.value, password.value).then((success: any) => {
     if(success) {
-      router.push("/organizations")
+      router.push("/organizations");
     }
   })
 }
 </script>
 
 <template>
-  <div class="loginContainer my-auto mx-auto px-5 py-5 border rounded my-auto d-flex flex-column">
+  <form class="loginContainer my-auto mx-auto px-5 py-5 border rounded my-auto d-flex flex-column" @submit.prevent="login">
     <div class="d-flex flex-column">
       <div class="d-flex flex-row py-2">
         <span>Email/Username</span>
@@ -41,8 +41,8 @@ const login = async () => {
     </div>
     <div class="d-flex flex-column">
       <div class="d-flex flex-row py-2 justify-content-center">
-        <button type="button" @click="login" class="btn btn-primary">Login</button>
+        <button type="submit" @click="login" class="btn btn-primary">Login</button>
       </div>
     </div>
-  </div>
+  </form>
 </template>
