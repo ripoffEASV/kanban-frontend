@@ -1,9 +1,9 @@
 // src/services/authService.js
 export default function authService() {
-  const getToken = () => localStorage.getItem('auth-token')
+  const getToken = () => localStorage.getItem('userID')
 
-  const setToken = (token: string) => {
-    localStorage.setItem('auth-token', token)
+  const setToken = (id: string) => {
+    localStorage.setItem('userID', id)
   }
 
   const isLoggedIn = () => {

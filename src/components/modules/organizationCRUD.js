@@ -1,13 +1,11 @@
 import * as GLOBAL from '../Globals/GLOBALS'
 
 export const addNewOrganization = async (orgName, inviteArr) => {
-  const bearerToken = 'bearer ' + localStorage.getItem('auth-token')
 
   await fetch(GLOBAL.URL + 'organizations/addNewOrganization', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     headers: {
-      'content-type': 'application/json',
-      Authorization: bearerToken
+      'content-type': 'application/json'
     },
     credentials: 'include',
     body: JSON.stringify({
@@ -30,13 +28,10 @@ export const addNewOrganization = async (orgName, inviteArr) => {
 
 export const getOrgs = async () => {
   try {
-    const token = localStorage.getItem('auth-token')
-
     const response = await fetch(GLOBAL.URL + 'organizations/getOrganizationsFromID', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       credentials: 'include'
     })

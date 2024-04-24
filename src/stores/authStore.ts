@@ -12,13 +12,13 @@ export const useAuthStore = defineStore('auth', () => {
     loggedIn.value = isLoggedIn()
   }
 
-  function login(token: string) {
-    setToken(token)
+  function login(userID: string) {
+    setToken(userID)
     checkLogin()
   }
 
   function logout() {
-    localStorage.removeItem('auth-token')
+    localStorage.removeItem('userID')
     checkLogin()
     router.push('/').catch((err) => {
       console.error('Router error:', err)
