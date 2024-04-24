@@ -1,11 +1,13 @@
 <template>
   <div class="kanban_outerBorder">
-    <h2 class="kanban_title" @dblclick="editBoard(props.board._id)">{{ props.board.stateName }}</h2>
+    <h2 class="kanban_title" @dblclick="editBoard(props.board.stateID)">
+      {{ props.board.stateName }}
+    </h2>
     <div class="separator"></div>
 
     <!-- Add other Kanban board content here -->
 
-    <div class="kanban_task_container" @dragover.prevent @drop="handleDrop(props.boardIndex)">
+    <!-- <div class="kanban_task_container" @dragover.prevent @drop="handleDrop(props.boardIndex)">
       <ul>
         <li
           v-for="(task, taskIndex) in props.board.tasks"
@@ -16,13 +18,13 @@
           @dblclick="editTask(props.boardIndex, taskIndex)"
         >
           <h4>{{ task.title }}</h4>
-          <!-- <p>{{ task.description }}</p> -->
+           <p>{{ task.description }}</p>
         </li>
       </ul>
-    </div>
+    </div> -->
   </div>
 
-  <div
+  <!-- <div
     class="modal fade newOrgModal"
     :class="{ show: isShowingModal }"
     tabindex="-1"
@@ -148,7 +150,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script lang="ts" setup>
@@ -207,14 +209,11 @@ const editBoard = (boardID: String) => {
 }
 
 const updateTask = (boardIndex: number, taskIndex: number) => {
-  let taskToUpdate = kanbanBoards.value[boardIndex].tasks[taskIndex]
-
-  taskToUpdate.title = taskTitle.value
-  taskToUpdate.description = taskDescription.value
-
-  refBoardIndex.value = -1
-  refTaskIndex.value = -1
-
-  isShowingModal.value = false
+  //   let taskToUpdate = kanbanBoards.value[boardIndex].tasks[taskIndex]
+  //   taskToUpdate.title = taskTitle.value
+  //   taskToUpdate.description = taskDescription.value
+  //   refBoardIndex.value = -1
+  //   refTaskIndex.value = -1
+  //   isShowingModal.value = false
 }
 </script>

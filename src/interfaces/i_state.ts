@@ -1,6 +1,6 @@
-export interface State{
-    stateID:number,
+export default interface State{
+    stateID:string,
     stateName:string,
     position:number,
-    taskArray?:number[],
+    taskArray: {taskName: string}[],
 }
