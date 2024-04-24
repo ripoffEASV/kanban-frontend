@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import router from '../router'
 import { useAuthStore } from '../stores/authStore';
@@ -11,6 +12,10 @@ const logout = async () => {
 const route = (destination: string) => {
   router.push(destination);
 }
+
+onMounted(() => {
+  authStore.checkLogin();
+})
 </script>
 
 <template>
