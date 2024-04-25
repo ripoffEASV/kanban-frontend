@@ -9,6 +9,8 @@ import userAvatar from '@/components/userAvatar.vue'
 import projectCardComponent from '@/components/projectCardComponent.vue'
 import i_singleUser from '../interfaces/i_singleUser.js'
 import i_project from '../interfaces/i_project.js'
+import OrganizationSettings from '../components/organizationSettings.vue';
+import Signup from '../components/SignupForm.vue'
 
 interface User {
   email: String
@@ -181,10 +183,6 @@ const getOrgs = async () => {
 
 const toggleOrgSettingsModal = () => {
   isShowingOrgChangeModal.value = !isShowingOrgChangeModal.value
-}
-
-const toggleFalseSettingsModal = () => {
-  isShowingOrgChangeModal.value = false
 }
 
 const addProjectBoard = (title: String) => {
@@ -406,122 +404,12 @@ onMounted(async () => {
     tabindex="-1"
     aria-labelledby="changeOrganizationSettingsModal"
   >
-    <div class="modal-dialog my-auto px-3">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title pe-3 text-dark">Organization Settings</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            v-on:click="toggleFalseSettingsModal"
-          ></button>
-        </div>
-        <div class="modal-body d-flex flex-column">
-          <div class="modal_flex_item">
-            <div class="modal_flex_item_title">
-              <span class="text-dark">Organization created by</span>
-            </div>
-
-            <div class="modal_flex_item flex-row">
-              <userAvatar
-                :f-name="currentOrg[0].createdByUser[0].fName"
-                :l-name="currentOrg[0].createdByUser[0].lName"
-                :color="currentOrg[0].createdByUser[0].color"
-              ></userAvatar>
-              <span class="ms-1 my-auto text-dark"
-                >{{ currentOrg[0].createdByUser[0].fName }}
-                {{ currentOrg[0].createdByUser[0].lName }}</span
-              >
-            </div>
-          </div>
-
-          <div class="modal_flex_item">
-            <div class="modal_flex_item_title">
-              <span class="text-dark">Organization Name</span>
-            </div>
-
-            <div class="modal_flex_item_content">
-              <input type="text" :value="currentOrg[0].orgName" :class="['form-control']" />
-            </div>
-          </div>
-
-          <div class="modal_flex_item">
-            <div class="modal_flex_item_title">
-              <span class="text-dark">Organization Owner</span>
-            </div>
-
-            <div class="modal_flex_item_content">
-              <input type="text" :value="currentOrg[0].owner[0].email" :class="['form-control']" />
-            </div>
-          </div>
-
-          <div class="modal_flex_item">
-            <div class="modal_flex_item_title">
-              <span class="text-dark">Organization Members</span>
-            </div>
-
-            <div class="modal_flex_item_content d-flex flex-row">
-              <input
-                type="email"
-                v-model="inputEmail"
-                placeholder="Email"
-                :class="['form-control me-3', isEmailValid()]"
-              />
-              <button
-                type="button"
-                v-on:click="addUserToInvite(inputEmail)"
-                class="btn btn-primary"
-                :disabled="isDisabledAddUser"
-              >
-                Add
-              </button>
-            </div>
-            <div class="modal_flex_item_content">
-              <OverlayScrollbarsComponent class="invited_div">
-                <div v-for="(user, index) in currentOrg[0].inviteArray" :key="user.email">
-                  <div class="invite_user_item">
-                    <span class="text-dark">{{ index + 1 }}: {{ user.email }}</span>
-                    <button
-                      @click="removeInvitedUser(user)"
-                      type="button"
-                      class="btn btn-danger px-2 py-0 ms-auto"
-                    >
-                      X
-                    </button>
-                  </div>
-                </div>
-              </OverlayScrollbarsComponent>
-
-              <div class="separator bg-dark my-1"></div>
-              <OverlayScrollbarsComponent class="existing_members_div">
-                <div v-for="(user, index) in currentOrg[0].inviteArray" :key="user.email">
-                  <div class="existing_user_item">
-                    <span class="text-dark">{{ index + 1 }}: {{ user.email }}</span>
-                    <button
-                      @click="removeInvitedUser(user)"
-                      type="button"
-                      class="btn btn-danger px-2 py-0 ms-auto"
-                    >
-                      X
-                    </button>
-                  </div>
-                </div>
-              </OverlayScrollbarsComponent>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" v-on:click="toggleFalseSettingsModal" class="btn btn-secondary">
-            Close
-          </button>
-          <button type="button" v-on:click="addNewOrganization" class="btn btn-primary">
-            Update Organization
-          </button>
-        </div>
-      </div>
-    </div>
+  <OrganizationSettings
+    v-if="isShowingOrgChangeModal"
+    :org="currentOrg[0]"
+    @closeSettingsModal="toggleOrgSettingsModal"
+    @get-orgs="getOrgs">
+  </OrganizationSettings>
   </div>
 
   <div
