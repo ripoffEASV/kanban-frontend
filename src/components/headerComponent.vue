@@ -6,6 +6,8 @@ import { useAuthStore } from '../stores/authStore';
 const authStore = useAuthStore();
 import userCrud from '../components/modules/loginCRUD';
 const { logout } = userCrud();
+import orgInviteHelper from '../components/modules/orgInviteHelper';
+const { numberOfInvites } = orgInviteHelper();
 
 const logoutUser = async () => {
   logout();
@@ -17,6 +19,7 @@ const route = (destination: string) => {
 
 onMounted(() => {
   authStore.checkLogin();
+  numberOfInvites();
 })
 </script>
 

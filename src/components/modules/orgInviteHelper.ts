@@ -1,12 +1,26 @@
 import * as GLOBAL from '../Globals/GLOBALS'
 import type { Invitation } from '../../interfaces/i_invitation';
+import { useInvitationStore } from '../../stores/invitationStore';
 
 export default function orgInvites() {
+    const { setInvitations } = useInvitationStore();
 
     const numberOfInvites = async () => {
-        const response = await fetch(GLOBAL.URL + 'organizations/checkUserInvites');
-        if (!response.ok) {
-            throw new Error('Failed to fetch organization invites for user');
+        try {
+            const response = await fetch(GLOBAL.URL + 'organizations/check-user-invites', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                // console.error('Failed to fetch organization invites for user');
+                return;
+            }
+
+            const invitations = await response.json();
+            setInvitations(invitations);
+        } catch (error) {
+            // console.error('Error fetching data:', error);
         }
     }
 
