@@ -8,7 +8,7 @@ import userCrud from '../components/modules/loginCRUD';
 const { logout } = userCrud();
 import orgInviteHelper from '../components/modules/orgInviteHelper';
 const { numberOfInvites } = orgInviteHelper();
-import InvitesNotification from './invitesNotification.vue';
+import InvitesNotification from '../components/invitation/invitesNotification.vue';
 
 const logoutUser = async () => {
   logout();
