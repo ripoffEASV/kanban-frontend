@@ -6,7 +6,7 @@ import * as Organization from '../components/modules/organizationCRUD.js'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import userAvatar from '@/components/userAvatar.vue'
-import projectCard from '@/components/projectCardComponent.vue'
+import projectCardComponent from '@/components/projectCardComponent.vue'
 import i_singleUser from '../interfaces/i_singleUser.js'
 import i_project from '../interfaces/i_project.js'
 
@@ -122,10 +122,10 @@ const orgNameCheck = () => {
 const loadProjects = async (orgID: string) => {
   try {
     let projectData = await Organization.loadProjects(orgID)
-
+    console.log(projectData)
     projects.value = []
 
-    projectData.forEach((element: any) => {
+    projectData.project.forEach((element: any) => {
       projects.value.push({
         projectID: element._id,
         projectName: element.projectName,
@@ -301,7 +301,7 @@ onMounted(async () => {
         <OverlayScrollbarsComponent class="d-flex flex-row justify-content-center h-100 pe-2">
           <div class="projects_container position-relative" v-if="orgRetrieved">
             <div v-for="project in projects">
-              <projectCard :project="project"></projectCard>
+              <projectCardComponent :project="project"></projectCardComponent>
             </div>
 
             <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable">

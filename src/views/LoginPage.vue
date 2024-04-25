@@ -4,11 +4,9 @@ import userCrud from '../components/modules/loginCRUD';
 import { useRouter } from 'vue-router';
 const { loginUser } = userCrud();
 
-
 const email = ref('')
 const password = ref('')
-const loggedIn = ref(false)
-const router = useRouter();
+const router = useRouter()
 
 const login = async () => {
 

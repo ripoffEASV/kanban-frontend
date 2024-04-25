@@ -1,5 +1,5 @@
 export interface Task{
-    taskID:number,
+    taskID:string,
     taskTitle:string,
     taskDescription?:string,
     hoursExpected?:number,
