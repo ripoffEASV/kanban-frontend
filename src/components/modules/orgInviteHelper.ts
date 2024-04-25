@@ -20,9 +20,25 @@ export default function orgInvites() {
             const invitations = await response.json();
             setInvitations(invitations);
         } catch (error) {
-            // console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error);
         }
     }
 
-    return { numberOfInvites };
+    const acceptInvite = async (orgID) => {
+        try {
+            const response = await fetch(GLOBAL.URL + 'organizations/accept-org-inv/' + orgID, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                return;
+            }
+            numberOfInvites();
+        } catch(err) {
+            console.error(err);
+        }
+    }
+
+    return { numberOfInvites, acceptInvite };
 }

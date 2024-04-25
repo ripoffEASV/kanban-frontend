@@ -18,7 +18,7 @@ onMounted(() => {
 
 <template>
     <article class="flex max-h-64 w-48">
-        <section class="flex flex-col w-full">
+        <section class="flex flex-col w-full overflow-auto">
             <div v-for="inv in invitations" :key="inv.id">
                 <SingleInvitation :inv="inv"></SingleInvitation>
             </div>

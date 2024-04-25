@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted } from 'vue';
 import type { Invitation } from '../../interfaces/i_invitation';
+import orgInviteHelper from '../../components/modules/orgInviteHelper';
+const { acceptInvite } = orgInviteHelper();
 const props = defineProps({
     inv: Object as () => Invitation,
 })
+
+const accept = () => {
+    acceptInvite(props.inv?.id);
+}
 </script>
 
 <template>
@@ -19,7 +25,7 @@ const props = defineProps({
         </section>
 
         <section class="flex justify-end items-center w-full gap-2 pr-2">
-            <button class="rounded-full bg-green-600 w-8 h-8 flex justify-center items-center hover:bg-green-700">
+            <button class="rounded-full bg-green-600 w-8 h-8 flex justify-center items-center hover:bg-green-700" @click="accept">
                 <i class="bi bi-check text-white"></i>
             </button>
             <button class="rounded-full bg-red-600 w-8 h-8 flex justify-center items-center hover:bg-red-700">
