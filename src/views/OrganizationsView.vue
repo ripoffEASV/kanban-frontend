@@ -106,8 +106,10 @@ const addNewOrganization = async () => {
       orgNameValid.value = 'has-error'
       throw new Error('Please input an organization name')
     }
+
+    const inviteArr = inviteArray.value.map(inv => inv.email);
     
-    await Organization.addNewOrganization(inputOrgName.value, inviteArray.value);
+    await Organization.addNewOrganization(inputOrgName.value, inviteArr);
     await getOrgs()
     await toggleModalFalse();
   } catch (error) {
@@ -124,7 +126,6 @@ const orgNameCheck = () => {
 const loadProjects = async (orgID: string) => {
   try {
     let projectData = await Organization.loadProjects(orgID)
-    console.log(projectData)
     projects.value = []
 
     projectData.project.forEach((element: any) => {
@@ -136,7 +137,6 @@ const loadProjects = async (orgID: string) => {
       })
     })
 
-    console.log(projectData)
   } catch (error) {
     console.log('an error occurred, when loading org projects: ', error.message)
   }
@@ -166,6 +166,7 @@ const loadOrg = async (orgID: string) => {
 }
 
 const getOrgs = async () => {
+  organizationsGet.value = [];
   const retrievedOrgs = await Organization.getOrgs()
 
   retrievedOrgs.data.organizations.forEach((org: Org) => {

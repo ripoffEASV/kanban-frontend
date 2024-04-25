@@ -83,7 +83,6 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
       orgID: orgID
     }
 
-    console.log(projectData)
 
     await fetch(GLOBAL.URL + 'projects/addNewProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -95,7 +94,6 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('request completed!: ', data)
       })
       .catch((err) => {
         alert(err.message)
@@ -129,8 +127,6 @@ export const updateOrganization = async (organization) => {
     if (!response.ok) {
       throw new Error(`Failed to fetch organizations: ${response.statusText}`)
     }
-
-    console.log(response);
 
     const data = await response.json()
     return { message: 'found orgs', data: data }

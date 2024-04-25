@@ -2,7 +2,7 @@
 import type { InviteUser } from '../interfaces/i_inviteUser';
 import { ref, defineProps, defineEmits, onMounted } from 'vue';
 import { addNewOrganization, updateOrganization  } from '../components/modules/organizationCRUD.js';
-import type { Organization } from '@/interfaces/i_organization';
+import type { Organization } from '../interfaces/i_organization';
 
 const inviteArray = ref([] as string[]);
 const inputEmail = ref('');
@@ -44,15 +44,15 @@ const removeInvitedUser = (index: number) => {
 }
 
 const addUserToInvite = (inviteEmail: string) => {
+    formGroup.value.inputEmail = '';
   inviteArray.value.push(inviteEmail);
 }
 
 const addOrganization = async () => {
   try {
-    /* if (inputOrgName.value == '') {
-      orgNameValid.value = 'has-error'
-      throw new Error('Please input an organization name')
-    } */
+    if (formGroup.value.inputOrgName == '') {
+      return;
+    }
 
     const org: Organization = {
         orgID: props.org._id,
