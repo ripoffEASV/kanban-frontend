@@ -1,8 +1,8 @@
 import * as GLOBAL from '../Globals/GLOBALS'
 import { useAuthStore } from '../../stores/authStore';
-const authStore = useAuthStore();
 
 export default function userCrud() {
+  const authStore = useAuthStore();
 
   const loginUser = async (emailOrUsername, password) => {
     try {
@@ -67,5 +67,23 @@ export default function userCrud() {
     }
   }
 
-  return { loginUser, signUpUser }
+  const logout = async () => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/logout', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        authStore.logout();
+        console.log('Logged out successfully');
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  return { loginUser, signUpUser, logout }
 }

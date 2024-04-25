@@ -4,9 +4,11 @@ import { RouterLink, useRouter } from 'vue-router'
 import router from '../router'
 import { useAuthStore } from '../stores/authStore';
 const authStore = useAuthStore();
+import userCrud from '../components/modules/loginCRUD';
+const { logout } = userCrud();
 
-const logout = async () => {
-  authStore.logout();
+const logoutUser = async () => {
+  logout();
 }
 
 const route = (destination: string) => {
@@ -52,7 +54,7 @@ onMounted(() => {
     </div>
     
     <div v-if="authStore.loggedIn" class="nav_item">
-      <button type="button" class="btn btn-primary" @click="logout">Logout</button>
+      <button type="button" class="btn btn-primary" @click="logoutUser">Logout</button>
     </div>
   </nav>
 </template>
