@@ -246,7 +246,7 @@ onMounted(async () => {
         <h3 class="mx-auto d-flex">Organizations</h3>
       </div>
       <div class="org_list_mainContainer d-flex flex-column h-100 overflow-hidden">
-        <OverlayScrollbarsComponent
+        <div
           class="org_scroll_container d-flex flex-column overflow-auto h-100"
         >
           <div v-for="(org, index) in organizationsGet" :key="index">
@@ -256,7 +256,7 @@ onMounted(async () => {
               @click="loadOrg(org._id)"
             ></OrgItem>
           </div>
-        </OverlayScrollbarsComponent>
+        </div>
       </div>
     </div>
     <div class="organizations_grid_2 h-100 overflow-hidden">
@@ -297,7 +297,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <OverlayScrollbarsComponent class="d-flex flex-row justify-content-center h-100 pe-2">
+        <div class="d-flex flex-row justify-content-center h-100 pe-2">
           <div class="projects_container position-relative" v-if="orgRetrieved">
             <div v-for="project in projects">
               <projectCardComponent :project="project"></projectCardComponent>
@@ -308,7 +308,7 @@ onMounted(async () => {
               <i class="bi bi-pencil-fill"></i>
             </button>
           </div>
-        </OverlayScrollbarsComponent>
+        </div>
       </div>
     </div>
   </div>
