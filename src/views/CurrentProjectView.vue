@@ -49,14 +49,14 @@
           ></button>
         </div>
         <div class="modal-body d-flex flex-column">
-          <div class="modal_flex_item">
+          <!-- <div class="modal_flex_item">
             <div class="modal_flex_item_title">
               <span class="text-dark">Task Description</span>
             </div>
             <div class="modal_flex_item_title pb-2">
               <span class="text-dark">{{ taskDescription }}</span>
             </div>
-          </div>
+          </div> -->
 
           <div class="modal_flex_item">
             <div class="modal_flex_item_title">
@@ -74,7 +74,29 @@
             </div>
 
             <div class="modal_flex_item_content d-flex flex-row">
-              <input type="text" v-model="taskDescription" :class="['form-control me-3']" />
+              <textarea type="text" v-model="taskDescription" :class="['form-control']" />
+            </div>
+          </div>
+
+          <div class="modal_flex_item">
+            <div class="modal_flex_item_title">
+              <span class="text-dark">Task Color</span>
+            </div>
+            <div class="modal_flex_item_content d-flex flex-row">
+              <div class="outerBorder_dropdown">
+                <div class="dropdown_title clickable">
+                  <span class="text-dark">Select Color</span>
+                </div>
+                <div class="dropdown_container d-flex flex-column">
+                  <div v-for="color in availableColors">
+                    <div class="color_selector clickable">
+                      <span class="text-dark me-1">{{ color.value }}</span>
+                      <span class="text-dark me-1">{{ color.color }}</span>
+                      <div class="colorBlock" :style="{ backgroundColor: color.hex }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -132,7 +154,7 @@
               <div class="modal_flex_item">
                 <div v-for="(task, index) in singleBoard.taskArray">
                   <span class="me-1 text-dark">{{ index + 1 }}:</span>
-                  <span class="text-dark">{{ task.taskName }}</span>
+                  <span class="text-dark">{{ task.taskTitle }}</span>
                 </div>
 
                 <div class="seperator"></div>
@@ -297,7 +319,7 @@ const addTaskToBoard = (boardID: string) => {
     kanbanBoards.value[index].taskArray = kanbanBoards.value[index].taskArray || []
     // Push the task to taskArray
     kanbanBoards.value[index].taskArray?.push({
-      taskName: tempTaskname.value
+      taskTitle: tempTaskname.value
     })
     console.log(kanbanBoards.value[index])
 
@@ -345,5 +367,22 @@ const updateBoard = async () => {
 
 .editBoardModal.show {
   display: flex !important;
+}
+
+.color_selector {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #444444;
+  padding: 0.25rem;
+  border-radius: 6px;
+}
+
+.colorBlock {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  margin-left: auto;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 </style>
