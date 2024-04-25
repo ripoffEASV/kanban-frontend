@@ -57,3 +57,4 @@ onMounted(() => {
       <button type="button" class="btn btn-primary" @click="logoutUser">Logout</button>
     </div>
   </nav>
+</template>
