@@ -1,7 +1,8 @@
 import * as GLOBAL from '../Globals/GLOBALS'
-import { ref } from 'vue'
+import { useAuthStore } from '../../stores/authStore';
 
 export default function userCrud() {
+  const authStore = useAuthStore();
 
   const loginUser = async (emailOrUsername, password) => {
     try {
@@ -24,8 +25,8 @@ export default function userCrud() {
         }
 
         const result = await response.json();
-        if (result && result.data && result.data.token) {
-          localStorage.setItem('auth-token', result.data.token);
+        if (result && result.data && result.data.userID) {
+          authStore.login(result.data.userID);
           return true;
         } else {
           return false;
@@ -47,17 +48,42 @@ export default function userCrud() {
         password
       }
   
-      await fetch(GLOBAL.URL + 'users/register', {
+      const response = await fetch(GLOBAL.URL + 'users/register', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
         },
         body: JSON.stringify(user)
-      })
+      });
+
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (err) {
       console.error(err.message);
+      return false;
     }
   }
 
-  return { loginUser, signUpUser }
+  const logout = async () => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/logout', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        authStore.logout();
+        console.log('Logged out successfully');
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  return { loginUser, signUpUser, logout }
 }

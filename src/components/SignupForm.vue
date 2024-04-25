@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import userCrud from './modules/loginCRUD'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { log } from 'console';
+import router from '@/router';
 
 const { signUpUser } = userCrud();
 
@@ -19,8 +20,14 @@ const formData = ref({
 });
 
 // Method
-function submitForm() {
-  signUpUser(formData.value.firstName, formData.value.lastName, formData.value.username, formData.value.email, formData.value.password);
+async function submitForm() {
+  await signUpUser(formData.value.firstName, formData.value.lastName, formData.value.username, formData.value.email, formData.value.password)
+  .then((success) => {
+    console.log(success);
+    if (success) {
+      router.push('/login');
+    }
+  })
 }
 
 const showPassword = ref({
@@ -105,6 +112,7 @@ const togglePasswordVisibility = (fieldName) => {
   padding: 10px 0;
   border: 1px solid #ddd;
   border-radius: 5px;
+  color: black;
 }
 button {
   width: 100%;
