@@ -1,36 +1,89 @@
 import * as GLOBAL from '../Globals/GLOBALS'
-import { ref } from 'vue'
+import { useAuthStore } from '../../stores/authStore';
 
-export const loginUser = async (email, password) => {
-  try {
-    const loggedIn = ref(false)
-    const data = {
-      emailOrUsername: email,
-      password: password
+export default function userCrud() {
+  const authStore = useAuthStore();
+
+  const loginUser = async (emailOrUsername, password) => {
+    try {
+      const data = {
+        emailOrUsername,
+        password: password
+      }
+
+      const response = await fetch(GLOBAL.URL + 'users/login', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+
+        if (!response.ok) {
+          throw new Error('Login failed!');
+        }
+
+        const result = await response.json();
+        if (result && result.data && result.data.userID) {
+          authStore.login(result.data.userID);
+          return true;
+        } else {
+          return false;
+        }
+
+    } catch (error) {
+      console.error(error)
+      return false;
     }
-
-    await fetch(GLOBAL.URL + 'users/login', {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        'content-type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(data) // body data type must match "Content-Type" header)
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        let token = data.data
-
-        localStorage.setItem('auth-token', '')
-        localStorage.setItem('auth-token', token.data)
-        loggedIn.value = true
-        console.log(loggedIn.value)
-      })
-      .catch((err) => {
-        alert(err.message)
-      })
-    return loggedIn.value
-  } catch (error) {
-    console.error(error.message)
   }
+
+  const signUpUser = async (fname, lname, username, email, password) => {
+    try {
+      const user = {
+        fName: fname,
+        lName: lname,
+        username,
+        email,
+        password
+      }
+  
+      const response = await fetch(GLOBAL.URL + 'users/register', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
+
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error(err.message);
+      return false;
+    }
+  }
+
+  const logout = async () => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/logout', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        authStore.logout();
+        console.log('Logged out successfully');
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  return { loginUser, signUpUser, logout }
 }

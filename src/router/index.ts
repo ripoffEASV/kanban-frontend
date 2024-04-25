@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import routerGuard from '../auth/guards/routerGuard'
+const { requireAuth } = routerGuard()
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,21 +20,24 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
-      path: '/Organizations',
+      path: '/organizations',
       name: 'Organizations',
-      component: () => import('../views/OrganizationsView.vue')
+      component: () => import('../views/OrganizationsView.vue'),
+      beforeEnter: requireAuth
     },
 
     {
-      path: '/Projects',
+      path: '/projects',
       name: 'Projects',
-      component: () => import('../views/ProjectsView.vue')
+      component: () => import('../views/ProjectsView.vue'),
+      beforeEnter: requireAuth
     },
 
     {
-      path: '/CurrentProject',
+      path: '/currentProject',
       name: 'CurrentProject',
-      component: () => import('../views/CurrentProjectView.vue')
+      component: () => import('../views/CurrentProjectView.vue'),
+      beforeEnter: requireAuth
     },
     {
       path: '/login',
@@ -46,6 +51,5 @@ const router = createRouter({
     }
   ]
 })
-
 
 export default router
