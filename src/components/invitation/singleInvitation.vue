@@ -2,7 +2,7 @@
 import { ref, defineProps, defineEmits, onMounted } from 'vue';
 import type { Invitation } from '../../interfaces/i_invitation';
 import orgInviteHelper from '../../components/modules/orgInviteHelper';
-const { acceptInvite } = orgInviteHelper();
+const { acceptInvite, declineInvite } = orgInviteHelper();
 const props = defineProps({
     inv: Object as () => Invitation,
 })
@@ -11,6 +11,11 @@ const isAnswered = ref(false);
 
 const accept = async () => {
     await acceptInvite(props.inv?.id);
+    isAnswered.value = true;
+}
+
+const decline = async () => {
+    await declineInvite(props.inv?.id);
     isAnswered.value = true;
 }
 </script>
@@ -32,7 +37,8 @@ const accept = async () => {
                 @click="accept">
                 <i class="bi bi-check text-white"></i>
             </button>
-            <button class="rounded-full bg-red-600 w-8 h-8 flex justify-center items-center hover:bg-red-700">
+            <button class="rounded-full bg-red-600 w-8 h-8 flex justify-center items-center hover:bg-red-700"
+                @click="decline">
                 <i class="bi bi-x text-white"></i>
             </button>
         </section>

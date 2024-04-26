@@ -40,5 +40,21 @@ export default function orgInvites() {
         }
     }
 
-    return { numberOfInvites, acceptInvite };
+    const declineInvite = async (orgID) => {
+        try {
+            const response = await fetch(GLOBAL.URL + 'organizations/decline-org-inv/' + orgID, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                return;
+            }
+            numberOfInvites();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    return { numberOfInvites, acceptInvite, declineInvite };
 }
