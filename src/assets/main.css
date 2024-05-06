@@ -158,7 +158,6 @@
   border-radius: 10px;
   padding: 0.5rem;
   margin: 1.5rem;
-  min-width: 350px
 }
 
 .kanban_title {
@@ -173,6 +172,8 @@
   list-style: none;
   background-color: rgb(75, 75, 75);
   border-radius: 6px;
+  margin: 0.75rem 0rem;
+  padding: 0.5rem;
 }
 
 .org_settings_icon_container {
@@ -331,4 +332,26 @@
 .kanban_title:hover{
   text-decoration: underline;
   cursor: pointer;
+}
+
+.kanbanBoard_State{
+  max-height: 100%;
+  min-width: 350px;
+  overflow: auto;
+}
+
+.kanbanBoard_State .kanban_outerBorder{
+  height: 100%;
+}
+
+.kanban_outerBorder .kanban_title{
+  position: sticky;
+  top: 0px;
+  padding: 0.25rem;
+  background-color: #181818;
+}
+.kanban_outerBorder .separator{
+  position: sticky;
+  top: 25px;
+  background-color: #FFFFFF;
 }
