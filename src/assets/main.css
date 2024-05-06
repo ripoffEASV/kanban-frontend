@@ -164,15 +164,26 @@
   white-space: nowrap;
 }
 
+.kanban_task_container {
+  padding: 0.25rem
+}
+
 .kanban_task_container ul {
   padding: unset !important;
 }
 
 .kanban_task_container li {
   list-style: none;
+
+  padding: 0.5rem;
+}
+
+.kanban_task_container h4 {
   background-color: rgb(75, 75, 75);
+  color: black;
+  font-weight: 600;
   border-radius: 6px;
-  margin: 0.75rem 0rem;
+  /* margin: 0.75rem 0rem; */
   padding: 0.5rem;
 }
 
@@ -256,11 +267,11 @@
   display: flex;
 }
 
-.org_member_title_span{
+.org_member_title_span {
   width: 4rem;
 }
 
-.add_project_div{
+.add_project_div {
   width: 50px;
   height: 50px;
   background-color: green;
@@ -274,22 +285,22 @@
 }
 
 
-.add_project_div i{
+.add_project_div i {
   font: 2.5em sans-serif;
   color: white;
   line-height: 0px;
 }
 
-.add_project_div .bi-pencil-fill{
+.add_project_div .bi-pencil-fill {
   font-size: 1.5rem;
   display: none;
 }
 
-.add_project_div:hover .bi-plus-lg{
+.add_project_div:hover .bi-plus-lg {
   display: none;
 }
 
-.add_project_div:hover .bi-pencil-fill{
+.add_project_div:hover .bi-pencil-fill {
   display: flex;
 }
 
@@ -298,7 +309,7 @@
   background-color: #000000b0;
 }
 
-.dragMemberContainer{
+.dragMemberContainer {
   border: 1px solid #CACACA;
   width: 100%;
   min-width: 49%;
@@ -312,46 +323,53 @@
   align-content: flex-start;
 }
 
-.dragMemberContainer .avatarContainer{
+.dragMemberContainer .avatarContainer {
   width: 30px;
   height: 30px;
 }
 
-.dragMemberContainer .avatarContainer:hover{
+.dragMemberContainer .avatarContainer:hover {
   cursor: grab;
 }
 
-.dragMemberContainer .avatarContainer.grab{
+.dragMemberContainer .avatarContainer.grab {
   cursor: grabbing;
 }
 
-.hide{
+.hide {
   display: none !important
 }
 
-.kanban_title:hover{
+.kanban_title:hover {
   text-decoration: underline;
   cursor: pointer;
 }
 
-.kanbanBoard_State{
+.kanbanBoard_State {
   max-height: 100%;
   min-width: 350px;
   overflow: auto;
 }
 
-.kanbanBoard_State .kanban_outerBorder{
+.kanbanBoard_State .kanban_outerBorder {
   height: 100%;
 }
 
-.kanban_outerBorder .kanban_title{
+.kanban_outerBorder .kanban_title {
   position: sticky;
   top: 0px;
   padding: 0.25rem;
   background-color: #181818;
+  font-size: 1.25rem;
+  font-weight: bold;
 }
-.kanban_outerBorder .separator{
+
+.kanban_outerBorder .separator {
   position: sticky;
   top: 25px;
   background-color: #FFFFFF;
+}
+
+.color_selector.active {
+  background-color: #5c5c5c63;
 }

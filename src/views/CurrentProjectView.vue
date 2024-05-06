@@ -10,7 +10,11 @@
 
           <!-- Add other Kanban board content here -->
 
-          <div class="kanban_task_container" @dragover.prevent @drop="handleDrop(boardIndex, tar)">
+          <div
+            class="kanban_task_container"
+            @dragover.prevent="handleDragOver(boardIndex, $event)"
+            @drop="handleDrop(boardIndex, targetTaskIndex)"
+          >
             <ul>
               <li
                 v-for="(task, taskIndex) in board.taskArray"
@@ -19,8 +23,9 @@
                 @dragstart="handleDragStart(boardIndex, taskIndex, $event)"
                 @dragend="handleDragEnd"
                 @dblclick="editTask(boardIndex, taskIndex, task._id)"
+                :id="'task_' + boardIndex + '_' + taskIndex"
               >
-                <h4>{{ task.taskTitle }}</h4>
+                <h4 :style="{ backgroundColor: task.labelColor }">{{ task.taskTitle }}</h4>
                 <!-- <p>{{ task.description }}</p> -->
               </li>
             </ul>
@@ -103,7 +108,15 @@
                     </div>
                     <div class="dropdown_container d-flex flex-column">
                       <div v-for="color in availableColors">
-                        <div class="color_selector clickable">
+                        <div
+                          class="color_selector clickable"
+                          :class="{
+                            active:
+                              updateSingleTask.labelColor != null &&
+                              color.hex == updateSingleTask.labelColor
+                          }"
+                          @click="setColor(color.value)"
+                        >
                           <span class="text-dark me-1">{{ color.value }}</span>
                           <span class="text-dark me-1">{{ color.color }}</span>
                           <div class="colorBlock" :style="{ backgroundColor: color.hex }"></div>
@@ -303,6 +316,11 @@ const singleBoard = ref('null')
 const updateSingleTask = ref([] as i_state[])
 const memberInfo = ref([] as i_singleUser[])
 
+const targetTaskIndex = ref(-1)
+const placeholderTop = ref(0) // Vertical position of the placeholder
+const isDragging = ref(false) // Whether a task is being dragged
+const dragTaskIndex = ref(-1) // Index of the dragged task
+
 onMounted(async () => {
   const urlParams = new URLSearchParams(window.location.search)
   projectID.value = urlParams.get('project')
@@ -328,21 +346,21 @@ const deleteTask = async (boardIndex, taskIndex) => {
 }
 
 const isMemberInTaskMembers = (member: any) => {
-  const isMemberInTaskMembersArray = taskMembers.member.some((taskMember) => {
-    return taskMember._id === member._id
-  })
 
-  if (isMemberInTaskMembersArray) {
-    return true
-  }
+  
 
-  const isUserAssigned = kanbanBoards.value.some((board) => {
-    return board.taskArray.some((task) => {
-      return task.assignedToID.some((user) => user.userID === member._id)
-    })
-  })
-
-  return isUserAssigned
+  // const isMemberInTaskMembersArray = taskMembers.member.some((taskMember) => {
+  //   return taskMember._id === member._id
+  // })
+  // if (isMemberInTaskMembersArray) {
+  //   return true
+  // }
+  // const isUserAssigned = kanbanBoards.value.some((board) => {
+  //   return board.taskArray.some((task) => {
+  //     return task.assignedToID.some((user) => user.userID === member._id)
+  //   })
+  // })
+  // return isUserAssigned
 }
 
 const handleDropAvailableUser = (event: DragEvent) => {
@@ -412,6 +430,11 @@ const loadStates = async (projectID: string) => {
 
 const availableColors = ref([
   {
+    value: 0,
+    color: 'none',
+    hex: '#FFFFFF'
+  },
+  {
     value: 1,
     color: 'lightBlue',
     hex: '#add8e6'
@@ -429,40 +452,92 @@ const availableColors = ref([
   {
     value: 4,
     color: 'lightYellow',
-    hex: '#ffffe0'
+    hex: '#fcde9f'
   }
 ])
 
 let dragBoardIndex = -1
-let dragTaskIndex = -1
 
 const handleDragStart = (boardIndex: number, taskIndex: number, event: DragEvent) => {
   dragBoardIndex = boardIndex
-  dragTaskIndex = taskIndex
+  dragTaskIndex.value = taskIndex
   console.log('task dragging')
 }
 
-const handleDrop = (targetBoardIndex: number, targetTaskIndex: number) => {
-  if (dragBoardIndex !== -1 && dragTaskIndex !== -1) {
-    const taskToMove = kanbanBoards.value[dragBoardIndex].taskArray[dragTaskIndex]
-    kanbanBoards.value[dragBoardIndex].taskArray.splice(dragTaskIndex, 1)
+const handleDrop = async (targetBoardIndex: number, targetTaskIndex: number) => {
+  try {
+    if (dragBoardIndex !== -1 && dragTaskIndex.value !== -1) {
+      const taskToMove = kanbanBoards.value[dragBoardIndex].taskArray[dragTaskIndex.value]
+      kanbanBoards.value[dragBoardIndex].taskArray.splice(dragTaskIndex.value, 1)
 
-    // Check if dropped above or below the target task
-    if (dragBoardIndex === targetBoardIndex && dragTaskIndex < targetTaskIndex) {
-      targetTaskIndex-- // Adjust index if dropped above target
+      // Adjust the targetTaskIndex if it's out of bounds
+      if (targetTaskIndex < 0) {
+        targetTaskIndex = 0
+      } else if (targetTaskIndex > kanbanBoards.value[targetBoardIndex].taskArray.length) {
+        targetTaskIndex = kanbanBoards.value[targetBoardIndex].taskArray.length
+      }
+
+      // Insert the taskToMove at the targetTaskIndex
+      kanbanBoards.value[targetBoardIndex].taskArray.splice(targetTaskIndex, 0, taskToMove)
+
+      // Update the position of all tasks in the target board
+      kanbanBoards.value[targetBoardIndex].taskArray.forEach(async (task, index) => {
+        if (task.stateID !== kanbanBoards.value[targetBoardIndex].stateID) {
+          await taskCRUD.updateTaskState(task._id, kanbanBoards.value[targetBoardIndex].stateID)
+
+          console.log('moved state')
+        }
+
+        task.position = index
+      })
+
+      dragBoardIndex = -1
+      dragTaskIndex.value = -1
+
+      await taskCRUD.updateTaskPosition(kanbanBoards.value[targetBoardIndex].taskArray)
+    }
+  } catch (error: any) {
+    console.log({ Title: 'error when moving task position', message: error.message })
+  }
+}
+// Drag over event handler to calculate the target task index
+const handleDragOver = (boardIndex: number, event: DragEvent) => {
+  // Get the index of the dragged task
+  const draggedTaskIndex = dragTaskIndex.value
+
+  // Ensure taskArray is not empty
+  if (kanbanBoards.value[boardIndex].taskArray.length > 0) {
+    // Get the position of the mouse relative to the viewport
+    const mouseY = event.clientY
+
+    // Calculate the index of the target task based on mouseY
+    let targetIndex = -1
+
+    // Loop through each task and check if mouseY is between its top and bottom positions
+    kanbanBoards.value[boardIndex].taskArray.forEach((task, index) => {
+      const taskElement = document.getElementById(`task_${boardIndex}_${index}`)
+      if (taskElement) {
+        const taskRect = taskElement.getBoundingClientRect()
+        if (mouseY >= taskRect.top && mouseY <= taskRect.bottom) {
+          // If mouseY is within the bounds of the task, set targetIndex to the current index
+          targetIndex = index
+        }
+      }
+    })
+
+    // If targetIndex is still -1, mouseY is below all tasks, so set targetIndex to the last index
+    if (targetIndex === -1) {
+      targetIndex = kanbanBoards.value[boardIndex].taskArray.length
     }
 
-    kanbanBoards.value[targetBoardIndex].taskArray.splice(targetTaskIndex, 0, taskToMove)
-
-    dragBoardIndex = -1
-    dragTaskIndex = -1
-    console.log('Task dropped')
+    // Set the targetTaskIndex value
+    targetTaskIndex.value = targetIndex
   }
 }
 
 const handleDragEnd = () => {
   dragBoardIndex = -1
-  dragTaskIndex = -1
+  dragTaskIndex.value = -1
 
   console.log('task drag end')
 }
@@ -530,7 +605,8 @@ const updateTask = async () => {
     taskID: updateSingleTask.value._id,
     taskTitle: updateSingleTask.value.taskTitle,
     taskDescription: updateSingleTask.value.taskDescription,
-    assignedToID: updateSingleTask.value.assignedToID
+    assignedToID: updateSingleTask.value.assignedToID,
+    labelColor: updateSingleTask.value.labelColor
   }
 
   console.log(data)
@@ -562,6 +638,26 @@ const toggleDropdown = (refVal: string) => {
       break
 
     default:
+      break
+  }
+}
+
+const setColor = (colorVal: number) => {
+  switch (colorVal) {
+    case 1:
+      updateSingleTask.value.labelColor = '#add8e6'
+      break
+    case 2:
+      updateSingleTask.value.labelColor = '#90ee90'
+      break
+    case 3:
+      updateSingleTask.value.labelColor = '#ffb6c1'
+      break
+    case 4:
+      updateSingleTask.value.labelColor = '#fcde9f'
+      break
+    default:
+      updateSingleTask.value.labelColor = '#4b4b4b'
       break
   }
 }
@@ -651,5 +747,11 @@ const toggleDropdown = (refVal: string) => {
 
 .taskModalBody {
   overflow: auto;
+}
+
+.placeholder {
+  background-color: #c7c7c7; /* Placeholder color */
+  height: 2px; /* Placeholder height */
+  transition: height 0.3s; /* Smooth transition */
 }
 </style>
