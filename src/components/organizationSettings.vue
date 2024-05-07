@@ -3,6 +3,7 @@ import { ref, defineProps, defineEmits, onMounted } from 'vue';
 import { addNewOrganization, updateOrganization  } from '../components/modules/organizationCRUD.js';
 import type { Organization } from '../interfaces/i_organization';
 import type { User } from '../interfaces/i_user';
+import userAvatar from '../components/userAvatar.vue';
 
 const inviteArray = ref<string[]>([]);
 const ownerArray = ref<User[]>([]);
@@ -12,8 +13,7 @@ const isDisabledAddUser = ref(true);
 
 const formGroup = ref({
     inputEmail: '',
-    inputOrgName: '',
-    inputOrgOwner: '123'
+    inputOrgName: ''
 });
 let regex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
@@ -32,16 +32,14 @@ onMounted(() => {
     props.org.inviteArray.forEach((user: string) => {
         inviteArray.value.push(user);
     });
+    console.log(props.org);
     props.org.owner.forEach((user: User) => {
         ownerArray.value.push(user);
     })
     props.org.members.forEach((user: User) => {
         memberArray.value.push(user);
     })
-    console.log(ownerArray.value);
-    console.log(memberArray.value);
     formGroup.value.inputOrgName = props.org.orgName;
-    formGroup.value.inputOrgOwner = props.org.owner[0].email;
 })
 
 const emitGetOrgs = () => {
@@ -76,12 +74,13 @@ const addOrganization = async () => {
     if (formGroup.value.inputOrgName == '') {
       return;
     }
+    const owners = ownerArray.value.map(o => o.id) as string[];
 
     const org: Organization = {
         orgID: props.org._id,
         orgName: formGroup.value.inputOrgName,
         createdByID: props.org.createdByID,
-        ownerID: formGroup.value.inputOrgOwner,
+        ownerID: owners,
         orgMembers: props.org.orgMembers,
         projectIDs: props.org.projectIDs,
         inviteArray: inviteArray.value
@@ -127,6 +126,7 @@ const isEmailValid = () => {
                         <span class="ms-1 my-auto text-dark">
                             {{ props.org.createdByUser[0].fName }}
                             {{ props.org.createdByUser[0].lName }}
+                            ({{ props.org.createdByUser[0].email }})
                         </span>
                     </div>
                 </div>
@@ -141,7 +141,7 @@ const isEmailValid = () => {
                     </div>
                 </div>
 
-                <div class="modal_flex_item">
+                <!-- <div class="modal_flex_item">
                     <div class="modal_flex_item_title">
                         <span class="text-dark">Organization Owner</span>
                     </div>
@@ -149,14 +149,21 @@ const isEmailValid = () => {
                     <div class="modal_flex_item_content">
                         <input type="text" v-model="formGroup.inputOrgOwner" :class="['form-control']" />
                     </div>
-                </div>
+                </div> -->
 
                 <h1 class="text-black mt-2">Current members</h1>
                 <OverlayScrollbarsComponent class="existing_members_div" v-if="memberArray.length > 0">
                     <div v-for="(user, index) in memberArray" :key="user.id">
                         <div class="existing_user_item">
-                            <span class="text-dark">{{ index + 1 }}: {{ user.fName }} {{ user.lName }} ({{ user.email
-                                }})</span>
+                            <span class="text-dark">
+                                {{ index + 1 }}:
+                                {{ user.fName }} {{ user.lName }}
+                                ({{ user.email }})
+                                <i v-if="ownerArray.some(owner => owner.id === user.id)"
+                                    v-b-tooltip.hover
+                                    title="This user is an owner"
+                                    class="bi bi-asterisk"></i>
+                            </span>
                             <button @click="removeMember(index)" type="button" class="btn btn-danger px-2 py-0 ms-auto">
                                 X
                             </button>
