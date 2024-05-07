@@ -11,6 +11,8 @@ import i_singleUser from '../interfaces/i_singleUser.js'
 import i_project from '../interfaces/i_project.js'
 import OrganizationSettings from '../components/organizationSettings.vue';
 import Signup from '../components/SignupForm.vue'
+import { useAuthStore } from '../stores/authStore';
+const authStore = useAuthStore();
 
 interface User {
   email: String
@@ -34,8 +36,8 @@ interface CurrentOrg {
   orgMembers: []
   projectIDs: []
   inviteArray: []
-  createdByUser: []
-  owner: []
+  createdByUser: i_singleUser[]
+  owner: i_singleUser[]
   orgUsers: []
 }
 
@@ -55,6 +57,7 @@ const tempProjectBoardName = ref('')
 const projectMembers: i_singleUser = reactive({ member: new Array() })
 const inputProjectName = ref()
 const projects = ref([] as i_project[])
+const currentUserId = ref('' as string | null);
 
 const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
 
@@ -136,6 +139,8 @@ const loadProjects = async (orgID: string) => {
         inviteArray: element.membersInfo
       })
     })
+
+    currentUserId.value = authStore.getUserID();
 
   } catch (error) {
     console.log('an error occurred, when loading org projects: ', error.message)
@@ -262,7 +267,7 @@ onMounted(async () => {
     <div class="organizations_grid_2 h-100 overflow-hidden">
       <div class="d-flex flex-column px-2 py-1 h-100">
         <div class="d-flex flex-row justify-content-center" v-if="orgRetrieved">
-          <div class="org_settings_icon_container my-auto mx-1" v-on:click="toggleOrgSettingsModal">
+          <div class="org_settings_icon_container my-auto mx-1" v-on:click="toggleOrgSettingsModal" v-if="currentUserId === currentOrg[0].ownerID">
             <i class="bi bi-gear org_settings_icon"></i>
             <i class="bi bi-gear-fill org_settings_icon"></i>
           </div>
@@ -303,7 +308,7 @@ onMounted(async () => {
               <projectCardComponent :project="project"></projectCardComponent>
             </div>
 
-            <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable">
+            <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable" v-if="currentUserId === currentOrg[0].ownerID">
               <i class="bi bi-plus-lg"></i>
               <i class="bi bi-pencil-fill"></i>
             </button>

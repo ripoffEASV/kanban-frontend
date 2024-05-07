@@ -6,14 +6,14 @@ import router from '../router'
 export const useAuthStore = defineStore('auth', () => {
   const loggedIn = ref(false)
 
-  const { isLoggedIn, setToken, getToken } = authService()
+  const { isLoggedIn, setUserID, getUserID } = authService()
 
   function checkLogin() {
     loggedIn.value = isLoggedIn()
   }
 
   function login(userID: string) {
-    setToken(userID)
+    setUserID(userID)
     checkLogin()
   }
 
@@ -25,5 +25,5 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
-  return { loggedIn, login, logout, getToken, checkLogin }
+  return { loggedIn, login, logout, getUserID, checkLogin }
 })

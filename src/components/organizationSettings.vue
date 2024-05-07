@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { InviteUser } from '../interfaces/i_inviteUser';
 import { ref, defineProps, defineEmits, onMounted } from 'vue';
 import { addNewOrganization, updateOrganization  } from '../components/modules/organizationCRUD.js';
 import type { Organization } from '../interfaces/i_organization';
+import type { User } from '../interfaces/i_user';
 
 const inviteArray = ref([] as string[]);
+const ownerArray = ref([] as User[]);
+const memberArray = ref([] as User[]);
 const inputEmail = ref('');
 const isDisabledAddUser = ref(true);
 
@@ -31,6 +33,14 @@ onMounted(() => {
     props.org.inviteArray.forEach((user: string) => {
         inviteArray.value.push(user);
     });
+    props.org.owner.forEach((user: User) => {
+        ownerArray.value.push(user);
+    })
+    props.org.members.forEach((user: User) => {
+        memberArray.value.push(user);
+    })
+    console.log(ownerArray.value);
+    console.log(memberArray.value);
     formGroup.value.inputOrgName = props.org.orgName;
     formGroup.value.inputOrgOwner = props.org.owner[0].email;
 })
@@ -41,6 +51,14 @@ const emitGetOrgs = () => {
 
 const removeInvitedUser = (index: number) => {
   inviteArray.value.splice(index, 1)
+}
+
+const removeMember = (index: number) => {
+  inviteArray.value.splice(index, 1)
+}
+
+const toggleOwner = (user: User) => {
+  ownerArray.value.push(user);
 }
 
 const addUserToInvite = (inviteEmail: string) => {
@@ -135,6 +153,29 @@ const isEmailValid = () => {
                     </div>
                 </div>
 
+                <h1 class="text-black mt-2">Current members</h1>
+                <OverlayScrollbarsComponent class="existing_members_div">
+                    <div v-for="(user, index) in memberArray" :key="user.id">
+                        <div class="existing_user_item">
+                            <span class="text-dark">{{ index + 1 }}: {{ user.fName }} {{ user.lName }} ({{ user.email }})</span>
+                            <button
+                                @click="removeMember(index)"
+                                type="button"
+                                class="btn btn-danger px-2 py-0 ms-auto"
+                            >
+                                X
+                            </button>
+                            <button
+                                @click="toggleOwner(user)"
+                                type="button"
+                                class="btn btn-primary px-2 py-0 ms-auto"
+                            >
+                                {{ ownerArray.some(owner => owner.id === user.id) ? 'Demote' : 'Promote' }}
+                            </button>
+                        </div>
+                    </div>
+                </OverlayScrollbarsComponent>
+
                 <div class="modal_flex_item">
                     <div class="modal_flex_item_title">
                         <span class="text-dark">Organization Members</span>
@@ -155,21 +196,8 @@ const isEmailValid = () => {
                         </button>
                     </div>
                     <div class="modal_flex_item_content">
-                        <!-- <OverlayScrollbarsComponent class="invited_div">
-                            <div v-for="(user, index) in props.org.inviteArray" :key="user.email">
-                                <div class="invite_user_item">
-                                    <span class="text-dark">{{ index + 1 }}: {{ user.email }}</span>
-                                    <button
-                                        @click="removeInvitedUser(user)"
-                                        type="button"
-                                        class="btn btn-danger px-2 py-0 ms-auto">
-                                        X
-                                    </button>
-                                </div>
-                            </div>
-                        </OverlayScrollbarsComponent> -->
-
                         <div class="separator bg-dark my-1"></div>
+                        <h1 class="text-black">Invites</h1>
                             <OverlayScrollbarsComponent class="existing_members_div">
                                 <div v-for="(user, index) in inviteArray" :key="user">
                                     <div class="existing_user_item">
