@@ -14,7 +14,7 @@ export const addNewOrganization = async (orgName, inviteArr) => {
       ownerID: '',
       orgMembers: [],
       projectIDs: [],
-      inviteArray: JSON.stringify(inviteArr)
+      inviteArray: inviteArr
     })
   })
     .then((res) => res.json())
@@ -83,7 +83,6 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
       orgID: orgID
     }
 
-    console.log(projectData)
 
     await fetch(GLOBAL.URL + 'projects/addNewProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -95,7 +94,6 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('request completed!: ', data)
       })
       .catch((err) => {
         alert(err.message)
@@ -113,5 +111,26 @@ export const loadProjects = async (orgID) => {
     return await projects.json()
   } catch (error) {
     console.log(error)
+  }
+}
+
+export const updateOrganization = async (organization) => {
+  try {
+    const response = await fetch(GLOBAL.URL + 'organizations/updateOrganization/' + organization.orgID, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(organization)
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch organizations: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return { message: 'found orgs', data: data }
+  } catch (err) {
+    console.log(err);
   }
 }

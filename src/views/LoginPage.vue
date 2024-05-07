@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import userCrud from '../components/modules/loginCRUD';
 import { useRouter } from 'vue-router';
 const { loginUser } = userCrud();
+import orgInviteHelper from '../components/modules/orgInviteHelper';
+const { numberOfInvites } = orgInviteHelper();
 
 const email = ref('')
 const password = ref('')
@@ -13,6 +15,7 @@ const login = async () => {
   await loginUser(email.value, password.value).then((success: any) => {
     if(success) {
       router.push("/organizations");
+      numberOfInvites();
     }
   })
 }
@@ -39,7 +42,7 @@ const login = async () => {
     </div>
     <div class="d-flex flex-column">
       <div class="d-flex flex-row py-2 justify-content-center">
-        <button type="submit" @click="login" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary">Login</button>
       </div>
     </div>
   </form>
