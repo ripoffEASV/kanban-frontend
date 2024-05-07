@@ -1,4 +1,4 @@
-export default interface State{
+export interface State{
     stateID:string,
     stateName:string,
     position:number,

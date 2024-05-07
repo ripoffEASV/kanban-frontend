@@ -6,6 +6,9 @@ import { useAuthStore } from '../stores/authStore';
 const authStore = useAuthStore();
 import userCrud from '../components/modules/loginCRUD';
 const { logout } = userCrud();
+import orgInviteHelper from '../components/modules/orgInviteHelper';
+const { numberOfInvites } = orgInviteHelper();
+import InvitesNotification from '../components/invitation/invitesNotification.vue';
 
 const logoutUser = async () => {
   logout();
@@ -17,11 +20,12 @@ const route = (destination: string) => {
 
 onMounted(() => {
   authStore.checkLogin();
+  numberOfInvites();
 })
 </script>
 
 <template>
-  <nav class="d-flex flex-row py-2 border header_component_nav justify-content-center">
+  <nav class="d-flex flex-row py-2 border header_component_nav justify-content-center relative">
     <div class="nav_item">
       <button type="button" class="btn btn-primary" @click="route('/')">
         <RouterLink to="/" class="text-white">Home</RouterLink>
@@ -56,5 +60,13 @@ onMounted(() => {
     <div v-if="authStore.loggedIn" class="nav_item">
       <button type="button" class="btn btn-primary" @click="logoutUser">Logout</button>
     </div>
+
+    <InvitesNotification v-if="authStore.loggedIn" class="absolute right-4 top-1/2 -translate-y-1/2"></InvitesNotification>
   </nav>
 </template>
+
+<style scoped>
+.btn_singup a {
+  color: white !important;
+}
+</style>
