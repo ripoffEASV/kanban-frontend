@@ -4,9 +4,9 @@ import { addNewOrganization, updateOrganization  } from '../components/modules/o
 import type { Organization } from '../interfaces/i_organization';
 import type { User } from '../interfaces/i_user';
 
-const inviteArray = ref([] as string[]);
-const ownerArray = ref([] as User[]);
-const memberArray = ref([] as User[]);
+const inviteArray = ref<string[]>([]);
+const ownerArray = ref<User[]>([]);
+const memberArray = ref<User[]>([]);
 const inputEmail = ref('');
 const isDisabledAddUser = ref(true);
 
@@ -27,7 +27,6 @@ const emits = defineEmits(['closeSettingsModal', 'getOrgs'])
 const toggleFalseSettingsModal = () => {
   emits('closeSettingsModal')
 }
-
 
 onMounted(() => {
     props.org.inviteArray.forEach((user: string) => {
@@ -54,11 +53,17 @@ const removeInvitedUser = (index: number) => {
 }
 
 const removeMember = (index: number) => {
-  inviteArray.value.splice(index, 1)
+    memberArray.value.splice(index, 1)
 }
 
-const toggleOwner = (user: User) => {
-  ownerArray.value.push(user);
+const toggleOwner = (user: User): void => {
+    const index = ownerArray.value.findIndex((u) => u.id === user.id);
+
+    if (index >= 0) {
+        ownerArray.value.splice(index, 1);
+    } else {
+        ownerArray.value.push(user);
+    }
 }
 
 const addUserToInvite = (inviteEmail: string) => {
@@ -106,13 +111,8 @@ const isEmailValid = () => {
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title pe-3 text-dark">Organization Settings</h5>
-                <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                v-on:click="toggleFalseSettingsModal"
-                ></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    v-on:click="toggleFalseSettingsModal"></button>
             </div>
             <div class="modal-body d-flex flex-column">
                 <div class="modal_flex_item">
@@ -121,11 +121,9 @@ const isEmailValid = () => {
                     </div>
 
                     <div class="modal_flex_item flex-row">
-                        <userAvatar
-                            :f-name="props.org.createdByUser[0].fName"
-                            :l-name="props.org.createdByUser[0].lName"
-                            :color="props.org.createdByUser[0].color"
-                        ></userAvatar>
+                        <userAvatar :f-name="props.org.createdByUser[0].fName"
+                            :l-name="props.org.createdByUser[0].lName" :color="props.org.createdByUser[0].color">
+                        </userAvatar>
                         <span class="ms-1 my-auto text-dark">
                             {{ props.org.createdByUser[0].fName }}
                             {{ props.org.createdByUser[0].lName }}
@@ -154,27 +152,21 @@ const isEmailValid = () => {
                 </div>
 
                 <h1 class="text-black mt-2">Current members</h1>
-                <OverlayScrollbarsComponent class="existing_members_div">
+                <OverlayScrollbarsComponent class="existing_members_div" v-if="memberArray.length > 0">
                     <div v-for="(user, index) in memberArray" :key="user.id">
                         <div class="existing_user_item">
-                            <span class="text-dark">{{ index + 1 }}: {{ user.fName }} {{ user.lName }} ({{ user.email }})</span>
-                            <button
-                                @click="removeMember(index)"
-                                type="button"
-                                class="btn btn-danger px-2 py-0 ms-auto"
-                            >
+                            <span class="text-dark">{{ index + 1 }}: {{ user.fName }} {{ user.lName }} ({{ user.email
+                                }})</span>
+                            <button @click="removeMember(index)" type="button" class="btn btn-danger px-2 py-0 ms-auto">
                                 X
                             </button>
-                            <button
-                                @click="toggleOwner(user)"
-                                type="button"
-                                class="btn btn-primary px-2 py-0 ms-auto"
-                            >
+                            <button @click="toggleOwner(user)" type="button" class="btn btn-primary px-2 py-0 ms-auto">
                                 {{ ownerArray.some(owner => owner.id === user.id) ? 'Demote' : 'Promote' }}
                             </button>
                         </div>
                     </div>
                 </OverlayScrollbarsComponent>
+                <div v-else class="text-red-600">There is no members assigned</div>
 
                 <div class="modal_flex_item">
                     <div class="modal_flex_item_title">
@@ -182,39 +174,31 @@ const isEmailValid = () => {
                     </div>
 
                     <div class="modal_flex_item_content d-flex flex-row">
-                        <input
-                            type="email"
-                            v-model="formGroup.inputEmail"
-                            placeholder="Email"
-                            :class="['form-control me-3', isEmailValid()]"/>
-                        <button
-                            type="button"
-                            v-on:click="addUserToInvite(formGroup.inputEmail)"
-                            class="btn btn-primary"
+                        <input type="email" v-model="formGroup.inputEmail" placeholder="Email"
+                            :class="['form-control me-3', isEmailValid()]" />
+                        <button type="button" v-on:click="addUserToInvite(formGroup.inputEmail)" class="btn btn-primary"
                             :disabled="isDisabledAddUser">
-                                Add
+                            Add
                         </button>
                     </div>
                     <div class="modal_flex_item_content">
                         <div class="separator bg-dark my-1"></div>
                         <h1 class="text-black">Invites</h1>
-                            <OverlayScrollbarsComponent class="existing_members_div">
-                                <div v-for="(user, index) in inviteArray" :key="user">
-                                    <div class="existing_user_item">
-                                        <span class="text-dark">{{ index + 1 }}: {{ user }}</span>
-                                        <button
-                                            @click="removeInvitedUser(index)"
-                                            type="button"
-                                            class="btn btn-danger px-2 py-0 ms-auto"
-                                        >
-                                            X
-                                        </button>
-                                    </div>
+                        <OverlayScrollbarsComponent class="existing_members_div" v-if="inviteArray.length > 0">
+                            <div v-for="(user, index) in inviteArray" :key="user">
+                                <div class="existing_user_item">
+                                    <span class="text-dark">{{ index + 1 }}: {{ user }}</span>
+                                    <button @click="removeInvitedUser(index)" type="button"
+                                        class="btn btn-danger px-2 py-0 ms-auto">
+                                        X
+                                    </button>
                                 </div>
-                            </OverlayScrollbarsComponent>
-                        </div>
+                            </div>
+                        </OverlayScrollbarsComponent>
+                        <div v-else class="text-red-600">No one currently has pending invites</div>
                     </div>
                 </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" v-on:click="toggleFalseSettingsModal" class="btn btn-secondary">
                     Close
