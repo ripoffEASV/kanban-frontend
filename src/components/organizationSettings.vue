@@ -33,7 +33,6 @@ onMounted(() => {
     props.org.inviteArray.forEach((user: string) => {
         inviteArray.value.push(user);
     });
-    console.log(props.org);
     props.org.owner.forEach((user: User) => {
         ownerArray.value.push(user);
     })

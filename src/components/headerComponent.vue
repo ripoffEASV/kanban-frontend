@@ -9,6 +9,7 @@ const { logout } = userCrud();
 import orgInviteHelper from '../components/modules/orgInviteHelper';
 const { numberOfInvites } = orgInviteHelper();
 import InvitesNotification from '../components/invitation/invitesNotification.vue';
+import UserAvatar from '../components/userAvatar.vue';
 
 const logoutUser = async () => {
   logout();
@@ -61,7 +62,17 @@ onMounted(() => {
       <button type="button" class="btn btn-primary" @click="logoutUser">Logout</button>
     </div>
 
-    <InvitesNotification v-if="authStore.loggedIn" class="absolute right-4 top-1/2 -translate-y-1/2"></InvitesNotification>
+    <section class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
+      <InvitesNotification v-if="authStore.loggedIn" ></InvitesNotification>
+      <UserAvatar 
+        @click="route('/user-settings')"
+        v-if="authStore.loggedIn" 
+        :f-name="authStore.getLoggedInUser()?.fName"
+        :l-name="authStore.getLoggedInUser()?.lName" 
+        :color="authStore.getLoggedInUser()?.color"
+        class="cursor-pointer select-none"></UserAvatar>
+    </section>
+    
   </nav>
 </template>
 

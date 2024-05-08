@@ -25,8 +25,8 @@ export default function userCrud() {
         }
 
         const result = await response.json();
-        if (result && result.data && result.data.userID) {
-          authStore.login(result.data.userID);
+        if (result && result.data && result.data.id) {
+          authStore.login(result.data);
           return true;
         } else {
           return false;
