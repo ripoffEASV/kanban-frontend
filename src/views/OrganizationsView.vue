@@ -300,7 +300,7 @@ onMounted(async () => {
             </div>
 
             <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable"
-              v-if="currentUserId === currentOrg[0].ownerID">
+              v-if="currentOrg[0].ownerID.includes(currentUserId)">
               <i class="bi bi-plus-lg"></i>
               <i class="bi bi-pencil-fill"></i>
             </button>

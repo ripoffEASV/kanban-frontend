@@ -134,3 +134,22 @@ export const updateOrganization = async (organization) => {
     console.log(err);
   }
 }
+
+export const deleteOrganization = async (orgId) => {
+  try {
+    const response = await fetch(GLOBAL.URL + 'organizations/delete-org/' + orgId, {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json'
+      },
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete org: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return { message: 'Deleted org', data}
+  } catch (err) {
+    console.log(err);
+  }
+}

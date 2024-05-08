@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted } from 'vue';
-import { addNewOrganization, updateOrganization  } from '../components/modules/organizationCRUD.js';
+import { addNewOrganization, updateOrganization, deleteOrganization  } from '../components/modules/organizationCRUD.js';
 import type { Organization } from '../interfaces/i_organization';
 import type { User } from '../interfaces/i_user';
 import userAvatar from '../components/userAvatar.vue';
@@ -13,7 +13,8 @@ const isDisabledAddUser = ref(true);
 
 const formGroup = ref({
     inputEmail: '',
-    inputOrgName: ''
+    inputOrgName: '',
+    deleteBox: false
 });
 let regex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
@@ -92,6 +93,18 @@ const addOrganization = async () => {
   } catch (error) {
     console.error(error);
   }
+}
+
+const deleteOrg = async () => {
+    if (!formGroup.value.deleteBox) {
+        return;
+    }
+    try {
+        await deleteOrganization(props.org._id);
+        toggleFalseSettingsModal();
+    } catch(error) {
+        console.error(error);
+    }
 }
 
 const isEmailValid = () => {
@@ -206,13 +219,24 @@ const isEmailValid = () => {
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" v-on:click="toggleFalseSettingsModal" class="btn btn-secondary">
-                    Close
-                </button>
-                <button type="button" v-on:click="addOrganization" class="btn btn-primary">
-                    Update Organization
-                </button>
+            <div class="modal-footer flex flex-col">
+                <section class="flex gap-2">
+                    <button type="button" v-on:click="toggleFalseSettingsModal" class="btn btn-secondary">
+                        Close
+                    </button>
+                    <button type="button" v-on:click="addOrganization" class="btn btn-primary">
+                        Update Organization
+                    </button>
+                </section>
+                <section class="flex gap-2">
+                    <label class="text-black flex justify-center flex-col items-center">
+                        <span>Confirm deletion</span>
+                        <input type="checkbox" v-model="formGroup.deleteBox">
+                    </label>
+                    <button type="button" v-on:click="deleteOrg" class="btn" :class="`${formGroup.deleteBox ? 'btn-danger' : '!cursor-not-allowed'}`">
+                        Delete Organization
+                    </button>
+                </section>
             </div>
         </div>
     </div>
