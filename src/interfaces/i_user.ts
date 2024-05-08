@@ -1,7 +1,9 @@
-export interface User{
-    id?: string,
-    email: string,
-    fName: string,
-    lName: string,
-    color: string
+export interface User {
+  id?: string
+  username: string
+  email: string
+  fName: string
+  lName: string
+  color: string
+  password?: string
 }
