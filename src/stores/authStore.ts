@@ -3,21 +3,39 @@ import { defineStore } from 'pinia'
 import authService from '../auth/authService'
 import router from '../router'
 import type { User } from '../interfaces/i_user'
+import userCrud from '../components/modules/loginCRUD'
 
 export const useAuthStore = defineStore('auth', () => {
   const loggedIn = ref(false)
   const loggedInUser = ref<User>()
 
   const { isLoggedIn, setUserID, getUserID } = authService()
+  const { getUserDetails } = userCrud()
 
   function checkLogin() {
     loggedIn.value = isLoggedIn()
+    if (loggedIn.value) {
+      fetchUserDetails()
+    }
   }
 
   function login(user: User) {
     setUserID(user.id)
     checkLogin()
     setLoggedInUser(user)
+  }
+
+  async function fetchUserDetails() {
+    const userID = getUserID()
+    if (userID) {
+      try {
+        const user = await getUserDetails()
+        setLoggedInUser(user)
+      } catch (error) {
+        console.error('Failed to fetch user details:', error)
+        logout()
+      }
+    }
   }
 
   function setLoggedInUser(user: User) {
@@ -37,5 +55,14 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
-  return { loggedIn, login, logout, getUserID, checkLogin, setLoggedInUser, getLoggedInUser }
+  return {
+    loggedIn,
+    login,
+    logout,
+    getUserID,
+    checkLogin,
+    setLoggedInUser,
+    getLoggedInUser,
+    fetchUserDetails
+  }
 })

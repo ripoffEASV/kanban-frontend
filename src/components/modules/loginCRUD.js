@@ -84,6 +84,22 @@ export default function userCrud() {
       console.error(err)
     }
   }
+  
+  const getUserDetails = async () => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/find-user', {
+        method: 'GET',
+        credentials: 'include'
+      });
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        const res = await response.json();
+        return res;
+    } catch (error) {
+        console.error('Failed to fetch user details:', error);
+    }
+  }
 
-  return { loginUser, signUpUser, logout }
+  return { loginUser, signUpUser, logout, getUserDetails }
 }
