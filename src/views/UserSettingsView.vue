@@ -7,10 +7,10 @@ const { updateUser } = userCrud();
 const authStore = useAuthStore()
 
 interface SettingsUser {
-  password?: string;
-  color?: string;
-  fName?: string;
-  lName?: string;
+  fName?: string
+  lName?: string
+  password?: string
+  color?: string
 }
 
 const user = ref<User>({
@@ -50,13 +50,9 @@ async function onUpdateUser() {
   if (!passwordsMatch.value || isPasswordTooShort.value) {
     return;
   }
-  authStore.setLoggedInUser(user.value);
   const newUser = createUserSettingsObj();
-  console.log(newUser);
-
-  return;
-  await updateUser(newUser);;
-  console.log(user.value);
+  await updateUser(newUser);
+  authStore.setLoggedInUser(user.value);
 }
 
 function createUserSettingsObj() {
