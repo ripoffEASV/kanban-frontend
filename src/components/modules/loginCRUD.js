@@ -101,5 +101,26 @@ export default function userCrud() {
     }
   }
 
-  return { loginUser, signUpUser, logout, getUserDetails }
+  const updateUser = async (user) => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/update-user', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
+      
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch(err) {
+      console.error('Error failed to edit user:', err);
+    }
+  }
+
+  return { loginUser, signUpUser, logout, getUserDetails, updateUser }
 }

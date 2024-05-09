@@ -2,7 +2,16 @@
 import { ref, watch, computed } from 'vue';
 import type { User } from '../interfaces/i_user'
 import { useAuthStore } from '../stores/authStore'
+import userCrud from '../components/modules/loginCRUD';
+const { updateUser } = userCrud();
 const authStore = useAuthStore()
+
+interface SettingsUser {
+  password?: string;
+  color?: string;
+  fName?: string;
+  lName?: string;
+}
 
 const user = ref<User>({
   fName: '',
@@ -36,12 +45,37 @@ watch(
   { immediate: true }
 );
 
-function updateUser() {
+async function onUpdateUser() {
   // API call to update the user data
   if (!passwordsMatch.value || isPasswordTooShort.value) {
     return;
   }
   authStore.setLoggedInUser(user.value);
+  const newUser = createUserSettingsObj();
+  console.log(newUser);
+
+  return;
+  await updateUser(newUser);;
+  console.log(user.value);
+}
+
+function createUserSettingsObj() {
+  const newUser: SettingsUser = {};
+  const currentUser = authStore.getLoggedInUser();
+  if (user.value.password) {
+    newUser.password = user.value.password;
+  }
+  if (user.value.color && user.value.color !== currentUser?.color) {
+    newUser.color = user.value.color;
+  }
+  if (user.value.fName && user.value.fName !== currentUser?.fName) {
+    newUser.fName = user.value.fName;
+  }
+  if (user.value.lName && user.value.lName !== currentUser?.lName) {
+    newUser.lName = user.value.lName;
+  }
+
+  return newUser;
 }
 
 function confirmDelete() {
@@ -60,7 +94,7 @@ function deleteAccount() {
 <template>
     <div class="max-w-lg mx-auto p-5">
       <h1 class="text-xl font-bold mb-6">User Settings</h1>
-      <form @submit.prevent="updateUser" class="space-y-4">
+      <form @submit.prevent="onUpdateUser" class="space-y-4">
         <!-- First Name -->
         <div>
           <label for="fName" class="block font-medium text-white">First Name:</label>
