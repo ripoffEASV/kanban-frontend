@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, computed } from 'vue';
 import type { User } from '../interfaces/i_user'
-import ColorPicker from 'primevue/colorpicker';
+import { useAuthStore } from '../stores/authStore'
+const authStore = useAuthStore()
 
 const user = ref<User>({
   fName: '',
@@ -12,12 +13,35 @@ const user = ref<User>({
   username: '',
   color: ''
 });
+const confirmPW = ref<string>('');
 
+const passwordsMatch = computed(() => user.value.password === confirmPW.value);
+const isPasswordTooShort = computed(() => {
+      if (user.value.password === '') {
+        return false;
+      }
+
+      return user.value.password.length < 3;
+    });
 const showDeleteConfirm = ref(false);
+
+watch(
+  () => authStore.getLoggedInUser(),
+  (newUser) => {
+    if (newUser) {
+      user.value = {... newUser};
+      user.value.password = '';
+    }
+  },
+  { immediate: true }
+);
 
 function updateUser() {
   // API call to update the user data
-  alert('User updated successfully!');
+  if (!passwordsMatch.value || isPasswordTooShort.value) {
+    return;
+  }
+  authStore.setLoggedInUser(user.value);
 }
 
 function confirmDelete() {
@@ -39,23 +63,40 @@ function deleteAccount() {
       <form @submit.prevent="updateUser" class="space-y-4">
         <!-- First Name -->
         <div>
-          <label for="fName" class="block font-medium text-gray-700">First Name:</label>
-          <input id="fName" v-model="user.fName" type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+          <label for="fName" class="block font-medium text-white">First Name:</label>
+          <input id="fName" v-model="user.fName" type="text" class="mt-1 block w-full p-2 border !border-gray-300 rounded-md shadow-sm">
         </div>
   
         <!-- Last Name -->
         <div>
-          <label for="lName" class="block font-medium text-gray-700">Last Name:</label>
-          <input id="lName" v-model="user.lName" type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+          <label for="lName" class="block font-medium text-white">Last Name:</label>
+          <input id="lName" v-model="user.lName" type="text" class="mt-1 block w-full p-2 border !border-gray-300 rounded-md shadow-sm">
         </div>
   
         <!-- Password -->
-        <div>
-          <label for="password" class="block font-medium text-gray-700">Password:</label>
-          <input id="password" v-model="user.password" type="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+        <div class="relative">
+          <label for="password" class="block font-medium text-white">Password:</label>
+          <input id="password" v-model="user.password" type="password" class="mt-1 block w-full p-2 border !border-gray-300 rounded-md shadow-sm">
+          <div v-if="isPasswordTooShort" class="text-red-600 top-0 right-0 absolute">
+            Password is too short. minimum 3
+          </div>
         </div>
 
-        <ColorPicker v-model="user.color" inputId="cp-hex" format="hex" class="mb-3" />
+        <!-- Confirm password -->
+        <div class="relative">
+          <label for="confirmPassword" class="block font-medium text-white">Confirm password:</label>
+          <input id="confirmPassword" v-model="confirmPW" type="password" class="mt-1 block w-full p-2 border !border-gray-300 rounded-md shadow-sm">
+          <div v-if="!passwordsMatch" class="text-red-600 top-0 right-0 absolute">
+            Passwords do not match.
+          </div>
+        </div>
+
+        <!-- Color picker -->
+        <div>
+          <label for="colorpicker" class="block font-medium text-white">User color:</label>
+          <v-color-picker id="colorpicker" hide-inputs v-model="user.color"></v-color-picker>
+        </div>
+        
   
         <!-- Update Button -->
         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
