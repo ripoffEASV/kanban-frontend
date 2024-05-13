@@ -137,7 +137,7 @@
                         @dragover.prevent
                         @drop="handleDropWorkingUser($event)"
                       >
-                        <div v-for="(member, index) in memberInfo">
+                        <div class="userAvatarIteration" v-for="(member, index) in memberInfo">
                           <div v-if="!isMemberInTaskMembers(member)">
                             <div
                               class="draggable_wrapper"
@@ -161,9 +161,12 @@
                       <div
                         class="user_drag_container working"
                         @dragover.prevent
-                        @drop="handleDropAvailableUser"
+                        @drop="handleDropAvailableUser($event)"
                       >
-                        <div v-for="(member, index) in taskMembers.member">
+                        <div
+                          class="userAvatarIteration"
+                          v-for="(member, index) in updateSingleTask.assignedToID"
+                        >
                           <div
                             class="draggable_wrapper"
                             draggable="true"
@@ -197,13 +200,7 @@
             <button type="button" v-on:click="toggleModalFalse" class="btn btn-secondary">
               Close
             </button>
-            <button
-              type="button"
-              v-on:click="updateTask(refBoardIndex, refTaskIndex)"
-              class="btn btn-primary"
-            >
-              Update
-            </button>
+            <button type="button" v-on:click="updateTask()" class="btn btn-primary">Update</button>
           </div>
         </div>
       </div>
@@ -288,8 +285,9 @@
 import { onMounted, ref, reactive } from 'vue'
 import * as projectCRUD from '../components/modules/projectCRUD.js'
 import * as taskCRUD from '../components/modules/taskCRUD.js'
-import type { i_state } from '../interfaces/i_state'
-import i_singleUser from '../interfaces/i_singleUser.js'
+import type { State } from '../interfaces/i_state'
+import type { User } from '../interfaces/i_singleUser.js'
+import type { Task } from '../interfaces/i_task.js'
 import userAvatar from '../components/userAvatar.vue'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
@@ -298,7 +296,7 @@ const isShowingModal = ref(false)
 const isShowingEditBoardModal = ref(false)
 const isDropdownActive = ref(false)
 
-const taskMembers: i_singleUser = reactive({ member: new Array(), taskID: '' })
+const taskMembers: User = reactive({ member: new Array(), taskID: '' })
 
 const tempBoardHeader = ref('')
 const tempBoardID = ref('')
@@ -311,10 +309,10 @@ const taskDescription = ref('')
 const refBoardIndex = ref(-1)
 const refTaskIndex = ref(-1)
 const projectID = ref()
-const kanbanBoards = ref([] as i_state[])
+const kanbanBoards = ref([] as State[])
 const singleBoard = ref('null')
-const updateSingleTask = ref([] as i_state[])
-const memberInfo = ref([] as i_singleUser[])
+const updateSingleTask = ref([] as Task[])
+const memberInfo = ref([] as User[])
 
 const targetTaskIndex = ref(-1)
 const placeholderTop = ref(0) // Vertical position of the placeholder
@@ -345,28 +343,20 @@ const deleteTask = async (boardIndex, taskIndex) => {
   }
 }
 
-const isMemberInTaskMembers = (member: any) => {
+const isMemberInTaskMembers = (member: User) => {
+  const isUserInAssignedToArray = updateSingleTask.value.assignedToID.some((user) => {
+    return user._id === member._id
+  })
 
-  
+  console.log(isUserInAssignedToArray)
 
-  // const isMemberInTaskMembersArray = taskMembers.member.some((taskMember) => {
-  //   return taskMember._id === member._id
-  // })
-  // if (isMemberInTaskMembersArray) {
-  //   return true
-  // }
-  // const isUserAssigned = kanbanBoards.value.some((board) => {
-  //   return board.taskArray.some((task) => {
-  //     return task.assignedToID.some((user) => user.userID === member._id)
-  //   })
-  // })
-  // return isUserAssigned
+  return isUserInAssignedToArray
 }
 
 const handleDropAvailableUser = (event: DragEvent) => {
   console.log('drag dropped: ', event.target)
 
-  const user: i_singleUser = {
+  const user: User = {
     _id: event.dataTransfer?.getData('userID'),
     fName: event.dataTransfer?.getData('user_fName'),
     lName: event.dataTransfer?.getData('user_lName'),
@@ -380,10 +370,21 @@ const handleDropAvailableUser = (event: DragEvent) => {
 const handleDropWorkingUser = (event: DragEvent) => {
   console.log('Drop event occurred')
   const target = event.target as HTMLElement
-  console.log('Target element:', target)
+
+  if (target.classList.contains('available')) {
+    const userID = event.dataTransfer?.getData('userID')
+    console.log(event.dataTransfer)
+
+    updateSingleTask.value.assignedToID.some((user, index) => {
+      if (user._id == userID) {
+        console.log('match!: ', index)
+        updateSingleTask.value.assignedToID.splice(index, 1)
+      }
+    })
+  }
 }
 
-const dragAvailableUser = (event: DragEvent, user: i_singleUser) => {
+const dragAvailableUser = (event: DragEvent, user: User) => {
   console.log('drag started')
   console.log('Dragged Target: ', event.target)
   console.log(user)
@@ -404,7 +405,7 @@ const loadStates = async (projectID: string) => {
     memberInfo.value = []
     taskMembers.member = []
 
-    await data.project[0].stateInfo.map(async (board: i_state) => {
+    await data.project[0].stateInfo.map(async (board: State) => {
       const tempTaskArray = data.project[0].taskArray.filter((task: any) => {
         return task.stateID == board.stateID
       })
@@ -715,19 +716,6 @@ const setColor = (colorVal: number) => {
   margin-bottom: auto;
 }
 
-.user_drag_container {
-  border: 1px solid #cacaca;
-  width: 100%;
-  height: 250px;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: row;
-}
-
-.draggable_wrapper {
-  margin: 0.25rem;
-}
-
 .taskModal.show {
   display: flex;
   background-color: #000000b0;
@@ -753,5 +741,25 @@ const setColor = (colorVal: number) => {
   background-color: #c7c7c7; /* Placeholder color */
   height: 2px; /* Placeholder height */
   transition: height 0.3s; /* Smooth transition */
+}
+
+.user_drag_container {
+  border: 1px solid #cacaca;
+  width: 100%;
+  height: 250px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: start;
+}
+
+.draggable_wrapper {
+  margin: 0.25rem;
+}
+
+.userAvatarIteration {
+  width: 36px;
+  height: 36px;
 }
 </style>

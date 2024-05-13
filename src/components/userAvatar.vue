@@ -36,5 +36,11 @@ const getInitials = (name: String) => {
   margin: auto;
   line-height: 0px;
   font-size: 12px;
+  font-weight: bold;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 </style>

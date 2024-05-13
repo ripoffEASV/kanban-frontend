@@ -7,14 +7,10 @@ import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import userAvatar from '@/components/userAvatar.vue'
 import projectCardComponent from '@/components/projectCardComponent.vue'
-import i_singleUser from '../interfaces/i_singleUser.js'
-import i_project from '../interfaces/i_project.js'
-import OrganizationSettings from '../components/organizationSettings.vue';
+import type { User } from '../interfaces/i_singleUser.js'
+import type { Project } from '../interfaces/i_project.js'
+import OrganizationSettings from '../components/organizationSettings.vue'
 import Signup from '../components/SignupForm.vue'
-
-interface User {
-  email: String
-}
 
 interface Org {
   _id: String
@@ -31,12 +27,12 @@ interface CurrentOrg {
   orgName: String
   createdByID: String
   ownerID: String
-  orgMembers: []
-  projectIDs: []
-  inviteArray: []
-  createdByUser: []
-  owner: []
-  orgUsers: []
+  orgMembers: User[]
+  projectIDs: String[]
+  inviteArray: String[]
+  createdByUser: User[]
+  owner: User[]
+  members: User[]
 }
 
 const isShowingModal = ref(false)
@@ -52,9 +48,9 @@ const isShowingOrgChangeModal = ref(false)
 const isShowingNewProjectModal = ref(false)
 const projectBoards: any = reactive({ boards: new Array() })
 const tempProjectBoardName = ref('')
-const projectMembers: i_singleUser = reactive({ member: new Array() })
+const projectMembers: User = reactive({ member: new Array() })
 const inputProjectName = ref()
-const projects = ref([] as i_project[])
+const projects = ref([] as Project[])
 
 const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
 
@@ -107,13 +103,13 @@ const addNewOrganization = async () => {
       throw new Error('Please input an organization name')
     }
 
-    const inviteArr = inviteArray.value.map(inv => inv.email);
-    
-    await Organization.addNewOrganization(inputOrgName.value, inviteArr);
+    const inviteArr = inviteArray.value.map((inv) => inv.email)
+
+    await Organization.addNewOrganization(inputOrgName.value, inviteArr)
     await getOrgs()
-    await toggleModalFalse();
-  } catch (error) {
-    console.error(error?.message)
+    await toggleModalFalse()
+  } catch (error: any) {
+    console.error(error.message)
   }
 }
 
@@ -136,8 +132,7 @@ const loadProjects = async (orgID: string) => {
         inviteArray: element.membersInfo
       })
     })
-
-  } catch (error) {
+  } catch (error: any) {
     console.log('an error occurred, when loading org projects: ', error.message)
   }
 }
@@ -166,7 +161,7 @@ const loadOrg = async (orgID: string) => {
 }
 
 const getOrgs = async () => {
-  organizationsGet.value = [];
+  organizationsGet.value = []
   const retrievedOrgs = await Organization.getOrgs()
 
   retrievedOrgs.data.organizations.forEach((org: Org) => {
@@ -195,7 +190,7 @@ const deleteProjectBoard = (index: number) => {
   projectBoards.value.splice(index, 1)
 }
 
-function startDrag(event: DragEvent, user: i_singleUser) {
+function startDrag(event: DragEvent, user: User) {
   console.log('drag started')
   console.log('Dragged Target: ', event.target)
   console.log(user)
@@ -210,7 +205,7 @@ function startDrag(event: DragEvent, user: i_singleUser) {
 function endDrop(event: DragEvent) {
   console.log('drag dropped: ', event.target)
 
-  const user: i_singleUser = {
+  const user: User = {
     _id: event.dataTransfer?.getData('userID'),
     fName: event.dataTransfer?.getData('user_fName'),
     lName: event.dataTransfer?.getData('user_lName'),
@@ -246,9 +241,7 @@ onMounted(async () => {
         <h3 class="mx-auto d-flex">Organizations</h3>
       </div>
       <div class="org_list_mainContainer d-flex flex-column h-100 overflow-hidden">
-        <div
-          class="org_scroll_container d-flex flex-column overflow-auto h-100"
-        >
+        <div class="org_scroll_container d-flex flex-column overflow-auto h-100">
           <div v-for="(org, index) in organizationsGet" :key="index">
             <OrgItem
               :org-index="index + 1"
@@ -300,7 +293,10 @@ onMounted(async () => {
         <div class="d-flex flex-row justify-content-center h-100 pe-2">
           <div class="projects_container position-relative" v-if="orgRetrieved">
             <div v-for="project in projects">
-              <projectCardComponent :project="project"></projectCardComponent>
+              <projectCardComponent
+                :orgMembers="currentOrg[0].members"
+                :project="project"
+              ></projectCardComponent>
             </div>
 
             <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable">
@@ -405,12 +401,13 @@ onMounted(async () => {
     tabindex="-1"
     aria-labelledby="changeOrganizationSettingsModal"
   >
-  <OrganizationSettings
-    v-if="isShowingOrgChangeModal"
-    :org="currentOrg[0]"
-    @closeSettingsModal="toggleOrgSettingsModal"
-    @get-orgs="getOrgs">
-  </OrganizationSettings>
+    <OrganizationSettings
+      v-if="isShowingOrgChangeModal"
+      :org="currentOrg[0]"
+      @closeSettingsModal="toggleOrgSettingsModal"
+      @get-orgs="getOrgs"
+    >
+    </OrganizationSettings>
   </div>
 
   <div

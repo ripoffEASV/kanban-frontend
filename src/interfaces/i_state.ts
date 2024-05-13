@@ -1,6 +1,7 @@
 export interface State{
-    stateID:string,
+    ID:string,
     stateName:string,
-    position:number,
+    position?:number,
     taskArray?: {taskName: string}[],
+    delete?: boolean
 }

@@ -7,6 +7,6 @@ export interface Task{
     labelColor?:string,
     labelText?:string,
     parentTaskID?:number,
-    assignedToID?:number[],
-    createdByID:number
+    assignedToID?:string[],
+    createdByID:string
 }
