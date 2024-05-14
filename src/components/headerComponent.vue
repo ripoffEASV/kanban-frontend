@@ -12,16 +12,16 @@ import InvitesNotification from '../components/invitation/invitesNotification.vu
 import UserAvatar from '../components/userAvatar.vue';
 
 const logoutUser = async () => {
-  logout();
+  logout()
 }
 
 const route = (destination: string) => {
-  router.push(destination);
+  router.push(destination)
 }
 
 onMounted(() => {
-  authStore.checkLogin();
-  numberOfInvites();
+  authStore.checkLogin()
+  numberOfInvites()
 })
 </script>
 
@@ -37,7 +37,7 @@ onMounted(() => {
         <RouterLink to="/organizations" class="text-white">Organizations</RouterLink>
       </button>
     </div>
-    <div v-if="authStore.loggedIn" class="nav_item">
+    <!-- <div v-if="authStore.loggedIn" class="nav_item">
       <button type="button" class="btn btn-primary" @click="route('/projects')">
         <RouterLink to="/projects" class="text-white">Projects</RouterLink>
       </button>
@@ -46,7 +46,7 @@ onMounted(() => {
       <button type="button" class="btn btn-primary" @click="route('/currentProject')">
         <RouterLink to="/currentProject" class="text-white">Current</RouterLink>
       </button>
-    </div>
+    </div> -->
     <div v-if="!authStore.loggedIn" class="nav_item">
       <button type="button" class="btn btn-primary" @click="route('/login')">
         <RouterLink to="/login" class="text-white">Login</RouterLink>
@@ -57,7 +57,7 @@ onMounted(() => {
         <RouterLink to="/signup" class="text-white">Signup</RouterLink>
       </button>
     </div>
-    
+
     <div v-if="authStore.loggedIn" class="nav_item">
       <button type="button" class="btn btn-primary" @click="logoutUser">Logout</button>
     </div>
@@ -72,7 +72,6 @@ onMounted(() => {
         :color="authStore.getLoggedInUser()?.color"
         class="cursor-pointer select-none"></UserAvatar>
     </section>
-    
   </nav>
 </template>
 

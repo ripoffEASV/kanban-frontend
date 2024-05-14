@@ -1,4 +1,4 @@
-export interface i_singleUser {
+export interface SingleUser {
   _id: string
   email: string
   fName: string
