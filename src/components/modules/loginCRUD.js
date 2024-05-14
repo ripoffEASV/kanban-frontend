@@ -25,8 +25,8 @@ export default function userCrud() {
         }
 
         const result = await response.json();
-        if (result && result.data && result.data.userID) {
-          authStore.login(result.data.userID);
+        if (result && result.data && result.data.id) {
+          authStore.login(result.data);
           return true;
         } else {
           return false;
@@ -84,6 +84,43 @@ export default function userCrud() {
       console.error(err)
     }
   }
+  
+  const getUserDetails = async () => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/find-user', {
+        method: 'GET',
+        credentials: 'include'
+      });
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        const res = await response.json();
+        return res;
+    } catch (error) {
+        console.error('Failed to fetch user details:', error);
+    }
+  }
 
-  return { loginUser, signUpUser, logout }
+  const updateUser = async (user) => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/update-user', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
+      
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch(err) {
+      console.error('Error failed to edit user:', err);
+    }
+  }
+
+  return { loginUser, signUpUser, logout, getUserDetails, updateUser }
 }

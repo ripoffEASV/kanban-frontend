@@ -40,6 +40,12 @@ const router = createRouter({
       beforeEnter: requireAuth
     },
     {
+      path: '/user-settings',
+      name: 'user-settings',
+      component: () => import('../views/UserSettingsView.vue'),
+      beforeEnter: requireAuth
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginPage.vue')
