@@ -122,5 +122,23 @@ export default function userCrud() {
     }
   }
 
-  return { loginUser, signUpUser, logout, getUserDetails, updateUser }
+  const deleteUser = async () => {
+    try {
+      const response = await fetch(GLOBAL.URL + 'users/delete', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log('Error failed to delete user', err);
+      return false;
+    }
+  }
+
+  return { loginUser, signUpUser, logout, getUserDetails, updateUser, deleteUser }
 }
