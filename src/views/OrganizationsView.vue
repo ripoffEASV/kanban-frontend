@@ -11,8 +11,8 @@ import type { User } from '../interfaces/i_singleUser.js'
 import type { Project } from '../interfaces/i_project.js'
 import OrganizationSettings from '../components/organizationSettings.vue'
 import Signup from '../components/SignupForm.vue'
-import { useAuthStore } from '../stores/authStore';
-const authStore = useAuthStore();
+import { useAuthStore } from '../stores/authStore'
+const authStore = useAuthStore()
 
 interface Org {
   _id: string
@@ -52,7 +52,7 @@ const projectBoards: any = reactive({ boards: new Array() })
 const tempProjectBoardName = ref('')
 const projectMembers: User = reactive({ member: new Array() })
 const inputProjectName = ref()
-const currentUserId = ref('' as string | null);
+const currentUserId = ref('' as string | null)
 const projects = ref<Project[]>([])
 
 const getRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
@@ -136,8 +136,7 @@ const loadProjects = async (orgID: string) => {
       })
     })
 
-    currentUserId.value = authStore.getUserID();
-
+    currentUserId.value = authStore.getUserID()
   } catch (error) {
     console.log('an error occurred, when loading org projects: ', error.message)
   }
@@ -200,7 +199,7 @@ function startDrag(event: DragEvent, user: User) {
   console.log('drag started')
   console.log('Dragged Target: ', event.target)
   console.log(user)
-  event.dataTransfer?.setData('userID', user._id)
+  event.dataTransfer?.setData('userID', user.id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)
   event.dataTransfer?.setData('user_color', user.color)
@@ -249,7 +248,11 @@ onMounted(async () => {
       <div class="org_list_mainContainer d-flex flex-column h-100 overflow-hidden">
         <div class="org_scroll_container d-flex flex-column overflow-auto h-100">
           <div v-for="(org, index) in organizationsGet" :key="index">
-            <OrgItem :org-index="index + 1" :org-name="org.orgName" @click="loadOrg(org._id)"></OrgItem>
+            <OrgItem
+              :org-index="index + 1"
+              :org-name="org.orgName"
+              @click="loadOrg(org._id)"
+            ></OrgItem>
           </div>
         </div>
       </div>
@@ -257,8 +260,11 @@ onMounted(async () => {
     <div class="organizations_grid_2 h-100 overflow-hidden">
       <div class="d-flex flex-column px-2 py-1 h-100">
         <div class="d-flex flex-row justify-content-center" v-if="orgRetrieved">
-          <div class="org_settings_icon_container my-auto mx-1" v-on:click="toggleOrgSettingsModal"
-            v-if="currentOrg[0].ownerID.includes(currentUserId)">
+          <div
+            class="org_settings_icon_container my-auto mx-1"
+            v-on:click="toggleOrgSettingsModal"
+            v-if="currentOrg[0].ownerID.includes(currentUserId)"
+          >
             <i class="bi bi-gear org_settings_icon"></i>
             <i class="bi bi-gear-fill org_settings_icon"></i>
           </div>
@@ -280,11 +286,16 @@ onMounted(async () => {
 
               <div class="d-flex flex-row py-1">
                 <span class="me-1 my-auto org_member_title_span">Creator:</span>
-                <userAvatar :f-name="currentOrg[0].createdByUser[0].fName"
-                  :l-name="currentOrg[0].createdByUser[0].lName" :color="currentOrg[0].createdByUser[0].color">
+                <userAvatar
+                  :f-name="currentOrg[0].createdByUser[0].fName"
+                  :l-name="currentOrg[0].createdByUser[0].lName"
+                  :color="currentOrg[0].createdByUser[0].color"
+                >
                 </userAvatar>
-                <span class="ms-1 my-auto">{{ currentOrg[0].createdByUser[0].fName }}
-                  {{ currentOrg[0].createdByUser[0].lName }}</span>
+                <span class="ms-1 my-auto"
+                  >{{ currentOrg[0].createdByUser[0].fName }}
+                  {{ currentOrg[0].createdByUser[0].lName }}</span
+                >
               </div>
             </div>
           </div>
@@ -298,8 +309,11 @@ onMounted(async () => {
               ></projectCardComponent>
             </div>
 
-            <button @click="toggleisShowingNewProjectModal" class="add_project_div clickable"
-              v-if="currentOrg[0].ownerID.includes(currentUserId)">
+            <button
+              @click="toggleisShowingNewProjectModal"
+              class="add_project_div clickable"
+              v-if="currentOrg[0].ownerID.includes(currentUserId)"
+            >
               <i class="bi bi-plus-lg"></i>
               <i class="bi bi-pencil-fill"></i>
             </button>
@@ -309,14 +323,23 @@ onMounted(async () => {
     </div>
   </div>
 
-  <div class="modal fade newOrgModal" :class="{ show: isShowingModal }" tabindex="-1"
-    aria-labelledby="NewOrganizationModal">
+  <div
+    class="modal fade newOrgModal"
+    :class="{ show: isShowingModal }"
+    tabindex="-1"
+    aria-labelledby="NewOrganizationModal"
+  >
     <div class="modal-dialog my-auto">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title pe-3 text-dark">Create New Organization</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-            v-on:click="toggleModalFalse"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            v-on:click="toggleModalFalse"
+          ></button>
         </div>
         <div class="modal-body d-flex flex-column">
           <div class="modal_flex_item">
@@ -325,8 +348,12 @@ onMounted(async () => {
             </div>
 
             <div class="modal_flex_item_content">
-              <input type="text" :class="['form-control', orgNameValid]" v-model="inputOrgName"
-                @change="orgNameCheck" />
+              <input
+                type="text"
+                :class="['form-control', orgNameValid]"
+                v-model="inputOrgName"
+                @change="orgNameCheck"
+              />
             </div>
           </div>
 
@@ -336,10 +363,18 @@ onMounted(async () => {
             </div>
 
             <div class="modal_flex_item_content d-flex flex-row">
-              <input type="email" v-model="inputEmail" placeholder="Email"
-                :class="['form-control me-3', isEmailValid()]" />
-              <button type="button" v-on:click="addUserToInvite(inputEmail)" class="btn btn-primary"
-                :disabled="isDisabledAddUser">
+              <input
+                type="email"
+                v-model="inputEmail"
+                placeholder="Email"
+                :class="['form-control me-3', isEmailValid()]"
+              />
+              <button
+                type="button"
+                v-on:click="addUserToInvite(inputEmail)"
+                class="btn btn-primary"
+                :disabled="isDisabledAddUser"
+              >
                 Add
               </button>
             </div>
@@ -348,8 +383,11 @@ onMounted(async () => {
                 <div v-for="(user, index) in inviteArray" :key="user.email">
                   <div class="invite_user_item">
                     <span class="text-dark">{{ index + 1 }}: {{ user.email }}</span>
-                    <button @click="removeInvitedUser(user?.email)" type="button"
-                      class="btn btn-danger px-2 py-0 ms-auto">
+                    <button
+                      @click="removeInvitedUser(user?.email)"
+                      type="button"
+                      class="btn btn-danger px-2 py-0 ms-auto"
+                    >
                       X
                     </button>
                   </div>
@@ -386,14 +424,24 @@ onMounted(async () => {
     </OrganizationSettings>
   </div>
 
-  <div v-if="orgRetrieved" class="modal fade newProjectModal" :class="{ show: isShowingNewProjectModal }" tabindex="-1"
-    aria-labelledby="changeOrganizationSettingsModal">
+  <div
+    v-if="orgRetrieved"
+    class="modal fade newProjectModal"
+    :class="{ show: isShowingNewProjectModal }"
+    tabindex="-1"
+    aria-labelledby="changeOrganizationSettingsModal"
+  >
     <div class="modal-dialog my-auto px-3">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title pe-3 text-dark">New Project</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-            v-on:click="toggleisShowingNewProjectModal"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            v-on:click="toggleisShowingNewProjectModal"
+          ></button>
         </div>
         <div class="modal-body d-flex flex-column">
           <div class="modal_flex_item py-1">
@@ -413,7 +461,11 @@ onMounted(async () => {
               <div v-for="(project, index) in projectBoards.boards" :key="index">
                 <div class="d-flex flex-row py-1">
                   <span class="w-100 text-dark">{{ index + 1 }}: {{ project.title }}</span>
-                  <button type="button" @click="deleteProjectBoard(index)" class="btn btn-danger px-2 py-0">
+                  <button
+                    type="button"
+                    @click="deleteProjectBoard(index)"
+                    class="btn btn-danger px-2 py-0"
+                  >
                     x
                   </button>
                 </div>
@@ -421,7 +473,11 @@ onMounted(async () => {
             </div>
             <div class="modal_flex_item flex-row">
               <input type="text" v-model="tempProjectBoardName" class="form-control" />
-              <button type="button" @click="addProjectBoard(tempProjectBoardName)" class="btn btn-primary mx-1">
+              <button
+                type="button"
+                @click="addProjectBoard(tempProjectBoardName)"
+                class="btn btn-primary mx-1"
+              >
                 Add
               </button>
             </div>
@@ -433,23 +489,49 @@ onMounted(async () => {
             </div>
             <div class="modal_flex_item flex-row">
               <div class="dragMemberContainer px-1 py-1">
-                <div class="avatarContainer" :draggable="true" v-for="member in currentOrg[0].members" :key="member._id"
-                  @dragstart="startDrag($event, member)">
-                  <userAvatar :fName="member.fName" :lName="member.lName" :color="member.color"></userAvatar>
+                <div
+                  class="avatarContainer"
+                  :draggable="true"
+                  v-for="member in currentOrg[0].members"
+                  :key="member.id"
+                  @dragstart="startDrag($event, member)"
+                >
+                  <userAvatar
+                    :fName="member.fName"
+                    :lName="member.lName"
+                    :color="member.color"
+                  ></userAvatar>
                 </div>
               </div>
 
-              <div class="dragMemberContainer px-1" :draggable="true" @drop="endDrop($event)" @dragover.prevent
-                @dragenter.prevent>
-                <div class="avatarContainer" v-for="member in projectMembers.member" :key="member._id">
-                  <userAvatar :fName="member.fName" :lName="member.lName" :color="member.color"></userAvatar>
+              <div
+                class="dragMemberContainer px-1"
+                :draggable="true"
+                @drop="endDrop($event)"
+                @dragover.prevent
+                @dragenter.prevent
+              >
+                <div
+                  class="avatarContainer"
+                  v-for="member in projectMembers.member"
+                  :key="member.id"
+                >
+                  <userAvatar
+                    :fName="member.fName"
+                    :lName="member.lName"
+                    :color="member.color"
+                  ></userAvatar>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" v-on:click="toggleFalseisShowingNewProjectModal" class="btn btn-secondary">
+          <button
+            type="button"
+            v-on:click="toggleFalseisShowingNewProjectModal"
+            class="btn btn-secondary"
+          >
             Close
           </button>
           <button type="button" v-on:click="addNewProject()" class="btn btn-primary">

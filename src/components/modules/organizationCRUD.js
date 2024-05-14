@@ -1,7 +1,6 @@
 import * as GLOBAL from '../Globals/GLOBALS'
 
 export const addNewOrganization = async (orgName, inviteArr) => {
-
   await fetch(GLOBAL.URL + 'organizations/addNewOrganization', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     headers: {
@@ -51,7 +50,6 @@ export const getOrgs = async () => {
 
 export const getSpecificOrg = async (orgID) => {
   try {
-
     const response = await fetch(GLOBAL.URL + 'organizations/getSpecificOrg/' + orgID, {
       method: 'GET',
       headers: {
@@ -83,7 +81,6 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
       orgID: orgID
     }
 
-
     await fetch(GLOBAL.URL + 'projects/addNewProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
@@ -93,8 +90,7 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
       body: JSON.stringify(projectData) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
-      .then((data) => {
-      })
+      .then((data) => {})
       .catch((err) => {
         alert(err.message)
       })
@@ -116,14 +112,17 @@ export const loadProjects = async (orgID) => {
 
 export const updateOrganization = async (organization) => {
   try {
-    const response = await fetch(GLOBAL.URL + 'organizations/updateOrganization/' + organization.orgID, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(organization)
-    });
+    const response = await fetch(
+      GLOBAL.URL + 'organizations/updateOrganization/' + organization.orgID,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(organization)
+      }
+    )
     if (!response.ok) {
       throw new Error(`Failed to fetch organizations: ${response.statusText}`)
     }
@@ -131,7 +130,7 @@ export const updateOrganization = async (organization) => {
     const data = await response.json()
     return { message: 'found orgs', data: data }
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
 }
 
@@ -143,13 +142,13 @@ export const deleteOrganization = async (orgId) => {
         'content-type': 'application/json'
       },
       credentials: 'include'
-    });
+    })
     if (!response.ok) {
-      throw new Error(`Failed to delete org: ${response.statusText}`);
+      throw new Error(`Failed to delete org: ${response.statusText}`)
     }
-    const data = await response.json();
-    return { message: 'Deleted org', data}
+    const data = await response.json()
+    return { message: 'Deleted org', data }
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
 }
