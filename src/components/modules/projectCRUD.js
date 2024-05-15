@@ -85,3 +85,25 @@ export const deleteProject = async (projectID) => {
     console.log(error.message)
   }
 }
+
+export const updateStatePositions = async (allStates) => {
+  const states = allStates.map(state => {
+    return {
+      position: state.position,
+      ID: state.stateID
+    };
+  });
+  try {
+    await fetch(GLOBAL.URL + 'projects/updateStatesPos', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(states)
+    });
+  } catch (err) {
+    console.error(err.message);
+  }
+  console.log(allStates);
+}

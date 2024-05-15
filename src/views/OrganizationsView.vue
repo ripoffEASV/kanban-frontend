@@ -224,7 +224,12 @@ function addNewProject() {
   const boards = projectBoards.boards
   const members = projectMembers.member
 
-  Organization.addNewProject(inputProjectName.value, boards, members, currentOrg.value[0]._id)
+  const updatedBoards = boards.map((b, index) => ({
+      ...b,
+      position: index + 1
+  }));
+
+  Organization.addNewProject(inputProjectName.value, updatedBoards, members, currentOrg.value[0]._id)
 }
 
 onMounted(async () => {
