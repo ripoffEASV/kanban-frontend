@@ -97,7 +97,8 @@ export default function userCrud() {
         const res = await response.json();
         return res;
     } catch (error) {
-        console.error('Failed to fetch user details:', error);
+      console.error('Failed to fetch user details:', error);
+      authStore.logout();
     }
   }
 

@@ -105,5 +105,4 @@ export const updateStatePositions = async (allStates) => {
   } catch (err) {
     console.error(err.message);
   }
-  console.log(allStates);
 }
