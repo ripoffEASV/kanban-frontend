@@ -8,6 +8,7 @@ export interface Organization {
   projectIDs?: string[]
   inviteArray?: string[]
   owner?: User[]
+  createdByUser?: User[]
   members?: User[]
   _id?: string
 }
