@@ -1,6 +1,6 @@
 import type { User } from '../interfaces/i_user'
 export interface Organization {
-  orgID: number
+  orgID: string
   orgName: string
   createdByID: string
   ownerID: string[]
@@ -10,5 +10,5 @@ export interface Organization {
   owner?: User[]
   createdByUser?: User[]
   members?: User[]
-  _id?: string
+  id?: string
 }

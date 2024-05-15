@@ -23,7 +23,6 @@ const formData = ref({
 async function submitForm() {
   await signUpUser(formData.value.firstName, formData.value.lastName, formData.value.username, formData.value.email, formData.value.password)
   .then((success) => {
-    console.log(success);
     if (success) {
       router.push('/login');
     }

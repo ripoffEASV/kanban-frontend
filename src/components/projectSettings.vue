@@ -20,7 +20,7 @@ const newProjectName = ref('')
 onMounted(() => {
   props.projectRef[0].projectStates?.forEach((board) => {
     projectBoards.value.push({
-      ID: board._id,
+      id: board.id,
       stateName: board.stateName,
       position: board.position
     })
@@ -28,7 +28,7 @@ onMounted(() => {
 
   props.projectRef[0].membersInfo?.forEach((member) => {
     assignedMembers.value.push({
-      _id: member._id,
+      id: member.id,
       email: member.email,
       fName: member.fName,
       lName: member.lName,
@@ -38,26 +38,28 @@ onMounted(() => {
 })
 const isMemberInTaskMembers = (member) => {
   const isUserInAssignedToArray = assignedMembers.value.some((user) => {
-    return user.id === member._id || user._id === member._id
+    return user.id === member.id
   })
+
   return isUserInAssignedToArray
 }
 
 const handleDropAvailableUser = (event: DragEvent) => {
-  console.log('drag dropped: ', event.target)
-
   const user: User = {
-    _id: event.dataTransfer?.getData('userID'),
+    id: event.dataTransfer?.getData('userID'),
     fName: event.dataTransfer?.getData('user_fName'),
     lName: event.dataTransfer?.getData('user_lName'),
     color: event.dataTransfer?.getData('user_color')
   }
-  console.log('assignedToID: ', user)
   assignedMembers.value.push(user)
+  props.orgMembers.some((user, index) => {
+    if (user.id == event.dataTransfer?.getData('userID')) {
+      assignedMembers.value.splice(index, 1)
+    }
+  })
 }
 
 const handleDropWorkingUser = (event: DragEvent) => {
-  console.log('Drop event occurred')
   let target = event.target as HTMLElement
 
   // Traverse up the DOM tree until a parent node with the class 'available' is found
@@ -71,12 +73,8 @@ const handleDropWorkingUser = (event: DragEvent) => {
 
     const userID = event.dataTransfer?.getData('userID')
 
-    console.log(userID)
-
     assignedMembers.value.some((user, index) => {
-      console.log(index)
-      if (user._id == userID) {
-        console.log('match!: ', index)
+      if (user.id == userID) {
         assignedMembers.value.splice(index, 1)
       }
     })
@@ -84,23 +82,18 @@ const handleDropWorkingUser = (event: DragEvent) => {
 }
 
 const dragAvailableUser = (event: DragEvent, user: User) => {
-  console.log('drag started')
-  console.log('Dragged Target: ', event.target)
-  console.log(user)
-  event.dataTransfer?.setData('userID', user._id)
+  event.dataTransfer?.setData('userID', user.id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)
   event.dataTransfer?.setData('user_color', user.color)
 }
 
-const dragAvailableUserEnd = (index: number) => {
-  console.log('Drag ended: ', index)
-}
+const dragAvailableUserEnd = (index: number) => {}
 
 const updateProjectCRUD = async () => {
   try {
     const data = {
-      projectID: props.projectRef[0]._id,
+      projectID: props.projectRef[0].id,
       newProjectName: newProjectName.value,
       newBoards: projectBoards.value,
       newMembers: assignedMembers.value
@@ -110,7 +103,7 @@ const updateProjectCRUD = async () => {
       emits('close')
     })
   } catch (error: any) {
-    console.log('something went wrong when updating project')
+    console.error('something went wrong when updating project')
   }
 }
 
@@ -133,7 +126,6 @@ const closeModal = () => {
 }
 
 const deleteBoard = (boardID: string, index: number) => {
-  console.log(boardID)
   if (boardID) {
     projectBoards.value[index].delete = !projectBoards.value[index].delete
   } else {
@@ -142,8 +134,7 @@ const deleteBoard = (boardID: string, index: number) => {
 }
 
 const deleteProject = async () => {
-  await projectCRUD.deleteProject(props.projectRef[0]._id).then(() => {
-    console.log('plx')
+  await projectCRUD.deleteProject(props.projectRef[0].id).then(() => {
     emits('close')
   })
 }

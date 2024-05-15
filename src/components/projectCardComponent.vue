@@ -13,9 +13,6 @@ const router = useRouter()
 const props = defineProps<{
   project: Project
   orgMembers: User[]
-  fName: string
-  lName: string
-  color: string
 }>()
 
 const projectRef = ref([] as Project[])
@@ -34,11 +31,10 @@ const showProjectSettings = async (event: MouseEvent, projectID: string) => {
     event.preventDefault()
     event.stopPropagation()
     await projectCRUD.getProjectData(projectID).then((projectData) => {
-      console.log(projectData)
       projectRef.value = projectData.data
     })
   } catch (error: any) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 

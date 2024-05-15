@@ -80,8 +80,6 @@ const addOrganization = async () => {
     }
     const owners = ownerArray.value.map((o) => o.id) as string[]
 
-    console.log(props.org)
-
     const org: Organization = {
       orgID: props.org._id,
       orgName: formGroup.value.inputOrgName,
@@ -105,7 +103,7 @@ const deleteOrg = async () => {
     return
   }
   try {
-    await deleteOrganization(props.org._id)
+    await deleteOrganization(props.org.orgID)
     toggleFalseSettingsModal()
   } catch (error) {
     console.error(error)

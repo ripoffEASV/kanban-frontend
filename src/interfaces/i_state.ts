@@ -1,5 +1,5 @@
 export interface State{
-    ID:string,
+    id:string,
     stateName:string,
     position?:number,
     taskArray?: {taskName: string}[],
