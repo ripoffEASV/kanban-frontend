@@ -3,7 +3,7 @@ import { ref, watch, computed } from 'vue';
 import type { User } from '../interfaces/i_user'
 import { useAuthStore } from '../stores/authStore'
 import userCrud from '../components/modules/loginCRUD';
-const { updateUser } = userCrud();
+const { updateUser, deleteUser } = userCrud();
 const authStore = useAuthStore()
 
 interface SettingsUser {
@@ -78,11 +78,14 @@ function confirmDelete() {
   showDeleteConfirm.value = true;
 }
 
-function deleteAccount() {
-  // API call to delete the user account
-  alert('Account deleted successfully!');
+async function deleteAccount() {
+  const deleted = await deleteUser();
+  if (deleted) {
+    authStore.logout();
+  } else {
+  alert('Somehting went wrong when deleting the user!');
   showDeleteConfirm.value = false;
-  // Redirect or perform other cleanup here
+  }
 }
 </script>
 

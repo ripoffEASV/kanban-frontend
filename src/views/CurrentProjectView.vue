@@ -1,7 +1,11 @@
 <template>
   <div class="kanban_Page_Container">
-    <div class="kanban_scrollable_container d-flex flex-row w-100 align-items-center">
-      <div class="kanbanBoard_State" v-for="(board, boardIndex) in kanbanBoards" :key="boardIndex">
+    <div class="kanban_scrollable_container d-flex flex-row w-100 align-items-center"
+                  @dragover.prevent
+                  @drop="dragAndDropState($event)">
+      <div class="kanbanBoard_State" v-for="(board, boardIndex) in kanbanBoards" :key="boardIndex"
+                        draggable="true"
+                        @dragstart="onDragStateStart($event, boardIndex)" :id="'kanbanStateBoard' + (boardIndex + 1)">
         <div class="kanban_outerBorder">
           <h2 class="kanban_title" @dblclick="editBoard(board.stateID, board.stateName)">
             {{ board.stateName }}
@@ -93,37 +97,44 @@
                 </div>
               </div>
 
+              <div class="modal_flex_item flex-row w-100 py-2">
+                <div class="modal_flex_item_title my-auto">
+                  <span class="text-dark">Expected Task Hours</span>
+                </div>
+
+                <div class="modal_flex_item_content d-flex flex-row ms-auto justify-end">
+                  <input
+                    type="text"
+                    maxlength="8"
+                    v-model="updateSingleTask.hoursExpected"
+                    class="form-control w-2/4"
+                    @input="sanitizeInput(1)"
+                  />
+                </div>
+              </div>
+
+              <div class="modal_flex_item flex-row w-100 py-2">
+                <div class="modal_flex_item_title my-auto">
+                  <span class="text-dark">Actual Task Hours</span>
+                </div>
+
+                <div class="modal_flex_item_content d-flex flex-row ms-auto justify-end">
+                  <input
+                    type="text"
+                    maxlength="8"
+                    v-model="updateSingleTask.hoursSpent"
+                    @input="sanitizeInput(2)"
+                    class="form-control w-2/4"
+                  />
+                </div>
+              </div>
+
               <div class="modal_flex_item">
                 <div class="modal_flex_item_title">
                   <span class="text-dark">Label Color</span>
                 </div>
                 <div class="modal_flex_item_content d-flex flex-row">
-                  <div
-                    class="outerBorder_dropdown"
-                    @click="toggleDropdown('isDropdownActive')"
-                    :class="{ show: isDropdownActive }"
-                  >
-                    <div class="dropdown_title clickable">
-                      <span class="text-dark">Select Color</span>
-                    </div>
-                    <div class="dropdown_container d-flex flex-column">
-                      <div v-for="color in availableColors">
-                        <div
-                          class="color_selector clickable"
-                          :class="{
-                            active:
-                              updateSingleTask.labelColor != null &&
-                              color.hex == updateSingleTask.labelColor
-                          }"
-                          @click="setColor(color.value)"
-                        >
-                          <span class="text-dark me-1">{{ color.value }}</span>
-                          <span class="text-dark me-1">{{ color.color }}</span>
-                          <div class="colorBlock" :style="{ backgroundColor: color.hex }"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <v-color-picker id="colorpicker" hide-inputs v-model="taskColor"></v-color-picker>
                 </div>
                 <div class="modal_flex_item">
                   <div class="modal_flex_item_title">
@@ -286,17 +297,18 @@ import { onMounted, ref, reactive } from 'vue'
 import * as projectCRUD from '../components/modules/projectCRUD.js'
 import * as taskCRUD from '../components/modules/taskCRUD.js'
 import type { State } from '../interfaces/i_state'
-import type { User } from '../interfaces/i_singleUser.js'
+import type { SingleUser } from '../interfaces/i_singleUser.js'
 import type { Task } from '../interfaces/i_task.js'
 import userAvatar from '../components/userAvatar.vue'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+import { ListFormat } from 'typescript'
 
 const isShowingModal = ref(false)
 const isShowingEditBoardModal = ref(false)
 const isDropdownActive = ref(false)
 
-const taskMembers: User = reactive({ member: new Array(), taskID: '' })
+const taskMembers: SingleUser = reactive({ member: new Array(), taskID: '' })
 
 const tempBoardHeader = ref('')
 const tempBoardID = ref('')
@@ -312,12 +324,15 @@ const projectID = ref()
 const kanbanBoards = ref([] as State[])
 const singleBoard = ref('null')
 const updateSingleTask = ref([] as Task[])
-const memberInfo = ref([] as User[])
+const memberInfo = ref([] as SingleUser[])
+const taskColor = ref('')
 
 const targetTaskIndex = ref(-1)
 const placeholderTop = ref(0) // Vertical position of the placeholder
 const isDragging = ref(false) // Whether a task is being dragged
 const dragTaskIndex = ref(-1) // Index of the dragged task
+
+let draggedIndex: number | null = null;
 
 onMounted(async () => {
   const urlParams = new URLSearchParams(window.location.search)
@@ -327,7 +342,6 @@ onMounted(async () => {
 
 const deleteTask = async (boardIndex, taskIndex) => {
   try {
-    console.log(boardIndex, taskIndex)
 
     await taskCRUD
       .deleteSingleTask(kanbanBoards.value[boardIndex].taskArray[taskIndex]._id)
@@ -343,51 +357,92 @@ const deleteTask = async (boardIndex, taskIndex) => {
   }
 }
 
-const isMemberInTaskMembers = (member: User) => {
+const isMemberInTaskMembers = (member: SingleUser) => {
   const isUserInAssignedToArray = updateSingleTask.value.assignedToID.some((user) => {
     return user._id === member._id
   })
-
-  console.log(isUserInAssignedToArray)
 
   return isUserInAssignedToArray
 }
 
 const handleDropAvailableUser = (event: DragEvent) => {
-  console.log('drag dropped: ', event.target)
 
-  const user: User = {
+  const user: SingleUser = {
     _id: event.dataTransfer?.getData('userID'),
     fName: event.dataTransfer?.getData('user_fName'),
     lName: event.dataTransfer?.getData('user_lName'),
     color: event.dataTransfer?.getData('user_color')
   }
   taskMembers.member.push(user)
-  console.log('assignedToID: ', updateSingleTask)
   updateSingleTask.value.assignedToID.push(user)
 }
 
 const handleDropWorkingUser = (event: DragEvent) => {
-  console.log('Drop event occurred')
   const target = event.target as HTMLElement
 
   if (target.classList.contains('available')) {
     const userID = event.dataTransfer?.getData('userID')
-    console.log(event.dataTransfer)
 
     updateSingleTask.value.assignedToID.some((user, index) => {
       if (user._id == userID) {
-        console.log('match!: ', index)
         updateSingleTask.value.assignedToID.splice(index, 1)
       }
     })
   }
 }
 
+function hasParentWithId(element: HTMLElement): number {
+  while (element) {
+    const match = element.id.match(/kanbanStateBoard(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10) - 1; // Extract the number and return it, zero-based index
+    }
+    element = element.parentElement as HTMLElement;
+  }
+  return -1;
+}
+
+const onDragStateStart = (event: DragEvent, index: number) => {
+  draggedIndex = index;
+  event.dataTransfer?.setData('text/plain', String(index));
+};
+
+const dragAndDropState = (event: DragEvent) => {
+  event.preventDefault();
+  const target = event.target as HTMLElement;
+  const targetIndex = hasParentWithId(target);
+
+  if (draggedIndex === null || targetIndex === -1 || draggedIndex === targetIndex) {
+    return;
+  }
+
+  const draggedBoard = kanbanBoards.value[draggedIndex];
+
+  if (!draggedBoard) {
+    console.error('Dragged board is undefined');
+    return;
+  }
+
+  // Remove the dragged item
+  kanbanBoards.value.splice(draggedIndex, 1);
+
+  // Insert the dragged item at the target index
+  kanbanBoards.value.splice(targetIndex, 0, draggedBoard);
+
+  // Update positions
+  kanbanBoards.value.forEach((board, index) => {
+    if (board) {
+      board.position = index + 1;
+    } else {
+      console.error(`Board at index ${index} is undefined`);
+    }
+  });
+
+  draggedIndex = null; // Reset draggedIndex
+  projectCRUD.updateStatePositions(kanbanBoards.value);
+};
+
 const dragAvailableUser = (event: DragEvent, user: User) => {
-  console.log('drag started')
-  console.log('Dragged Target: ', event.target)
-  console.log(user)
   event.dataTransfer?.setData('userID', user._id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)
@@ -395,12 +450,10 @@ const dragAvailableUser = (event: DragEvent, user: User) => {
 }
 
 const dragAvailableUserEnd = (index: number) => {
-  console.log('Drag ended: ', index)
 }
 
 const loadStates = async (projectID: string) => {
   await projectCRUD.loadStatesFromProjectID(projectID).then(async (data: any) => {
-    console.log(data.project[0])
     kanbanBoards.value = []
     memberInfo.value = []
     taskMembers.member = []
@@ -416,6 +469,7 @@ const loadStates = async (projectID: string) => {
         taskArray: tempTaskArray
       })
     })
+    kanbanBoards.value.sort((a, b) => a?.position - b?.position);
 
     await data.project[0].membersInfo.map(async (member: any) => {
       memberInfo.value.push({
@@ -429,40 +483,11 @@ const loadStates = async (projectID: string) => {
   })
 }
 
-const availableColors = ref([
-  {
-    value: 0,
-    color: 'none',
-    hex: '#FFFFFF'
-  },
-  {
-    value: 1,
-    color: 'lightBlue',
-    hex: '#add8e6'
-  },
-  {
-    value: 2,
-    color: 'lightGreen',
-    hex: '#90ee90'
-  },
-  {
-    value: 3,
-    color: 'lightRed',
-    hex: '#ffb6c1'
-  },
-  {
-    value: 4,
-    color: 'lightYellow',
-    hex: '#fcde9f'
-  }
-])
-
 let dragBoardIndex = -1
 
 const handleDragStart = (boardIndex: number, taskIndex: number, event: DragEvent) => {
   dragBoardIndex = boardIndex
   dragTaskIndex.value = taskIndex
-  console.log('task dragging')
 }
 
 const handleDrop = async (targetBoardIndex: number, targetTaskIndex: number) => {
@@ -486,7 +511,6 @@ const handleDrop = async (targetBoardIndex: number, targetTaskIndex: number) => 
         if (task.stateID !== kanbanBoards.value[targetBoardIndex].stateID) {
           await taskCRUD.updateTaskState(task._id, kanbanBoards.value[targetBoardIndex].stateID)
 
-          console.log('moved state')
         }
 
         task.position = index
@@ -539,22 +563,18 @@ const handleDragOver = (boardIndex: number, event: DragEvent) => {
 const handleDragEnd = () => {
   dragBoardIndex = -1
   dragTaskIndex.value = -1
-
-  console.log('task drag end')
 }
 
 // replace taskindex with taskID
 const editTask = (boardIndex: number, taskIndex: number, taskID: string) => {
-  console.log('double click', taskIndex)
   updateSingleTask.value = kanbanBoards.value[boardIndex].taskArray[taskIndex]
 
   refBoardIndex.value = boardIndex
   refTaskIndex.value = taskIndex
+  taskColor.value = updateSingleTask.value.labelColor
 
   //taskTitle.value = taskToEdit.taskName
   //taskDescription.value = taskToEdit.description
-
-  console.log(taskID)
 
   taskMembers.taskID = taskID
   //tempTaskID.value = taskID
@@ -563,7 +583,6 @@ const editTask = (boardIndex: number, taskIndex: number, taskID: string) => {
 }
 
 const editBoard = (boardID: string, boardName: string) => {
-  console.log('dbl click, edit board: ', boardID)
   isShowingEditBoardModal.value = true
 
   let tempIndex = kanbanBoards.value.findIndex((board) => board.stateID === boardID)
@@ -585,7 +604,6 @@ const addTaskToBoard = (boardID: string) => {
     kanbanBoards.value[index].taskArray?.push({
       taskTitle: tempTaskname.value
     })
-    console.log(kanbanBoards.value[index])
 
     tempTaskname.value = ''
   } else {
@@ -607,10 +625,10 @@ const updateTask = async () => {
     taskTitle: updateSingleTask.value.taskTitle,
     taskDescription: updateSingleTask.value.taskDescription,
     assignedToID: updateSingleTask.value.assignedToID,
-    labelColor: updateSingleTask.value.labelColor
+    labelColor: taskColor.value,
+    hoursExpected: updateSingleTask.value.hoursExpected | 0,
+    hoursSpent: updateSingleTask.value.hoursSpent | 0
   }
-
-  console.log(data)
 
   await taskCRUD.updateSingleTask(data)
 
@@ -626,39 +644,20 @@ const updateBoard = async () => {
   }
 
   await projectCRUD.updateSingleProjectBoard(data)
-
-  await console.log(data)
 }
 
-const toggleDropdown = (refVal: string) => {
-  console.log(refVal)
-
-  switch (refVal) {
-    case 'isDropdownActive':
-      isDropdownActive.value = !isDropdownActive.value
-      break
-
-    default:
-      break
-  }
-}
-
-const setColor = (colorVal: number) => {
-  switch (colorVal) {
+// Sanitize the input value to contain only numeric characters
+// type defines what which input was throwing the event
+const sanitizeInput = (type: number) => {
+  switch (type) {
     case 1:
-      updateSingleTask.value.labelColor = '#add8e6'
+      updateSingleTask.value.hoursExpected = updateSingleTask.value.hoursExpected.replace(/\D/g, '')
       break
     case 2:
-      updateSingleTask.value.labelColor = '#90ee90'
+      updateSingleTask.value.hoursSpent = updateSingleTask.value.hoursSpent.replace(/\D/g, '')
       break
-    case 3:
-      updateSingleTask.value.labelColor = '#ffb6c1'
-      break
-    case 4:
-      updateSingleTask.value.labelColor = '#fcde9f'
-      break
+
     default:
-      updateSingleTask.value.labelColor = '#4b4b4b'
       break
   }
 }

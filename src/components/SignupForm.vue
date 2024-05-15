@@ -112,7 +112,7 @@ const togglePasswordVisibility = (fieldName) => {
   padding: 10px 0;
   border: 1px solid #ddd;
   border-radius: 5px;
-  color: black;
+  color: white;
 }
 button {
   width: 100%;
