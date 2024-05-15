@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, onMounted, ref, reactive } from 'vue'
 import OrgItem from '../components/organization_Item.vue'
-import * as Organization from '../components/modules/organizationCRUD.js'
+import * as OrganizationCRUD from '../components/modules/organizationCRUD.js'
 
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
@@ -9,6 +9,7 @@ import userAvatar from '@/components/userAvatar.vue'
 import projectCardComponent from '@/components/projectCardComponent.vue'
 import type { User } from '../interfaces/i_singleUser.js'
 import type { Project } from '../interfaces/i_project.js'
+import type { Organization } from '@/interfaces/i_organization'
 import OrganizationSettings from '../components/organizationSettings.vue'
 import Signup from '../components/SignupForm.vue'
 import { useAuthStore } from '../stores/authStore'
@@ -24,19 +25,6 @@ interface Org {
   inviteArray: []
 }
 
-interface CurrentOrg {
-  _id: string
-  orgName: string
-  createdByID: string
-  ownerID: string
-  orgMembers: User[]
-  projectIDs: string[]
-  inviteArray: string[]
-  createdByUser: User[]
-  owner: User[]
-  members: User[]
-}
-
 const isShowingModal = ref(false)
 const orgRetrieved = ref(false)
 const isDisabledAddUser = ref(true)
@@ -45,7 +33,7 @@ const inputEmail = ref('')
 const inputOrgName = ref('')
 const orgNameValid = ref('')
 const organizationsGet = ref([] as Org[]) // use this for later when the backend works...
-const currentOrg = ref([] as CurrentOrg[])
+const currentOrg = ref([] as Organization[])
 const isShowingOrgChangeModal = ref(false)
 const isShowingNewProjectModal = ref(false)
 const projectBoards: any = reactive({ boards: new Array() })
@@ -108,7 +96,7 @@ const addNewOrganization = async () => {
 
     const inviteArr = inviteArray.value.map((inv) => inv.email)
 
-    await Organization.addNewOrganization(inputOrgName.value, inviteArr)
+    await OrganizationCRUD.addNewOrganization(inputOrgName.value, inviteArr)
     await getOrgs()
     await toggleModalFalse()
   } catch (error: any) {
@@ -124,7 +112,7 @@ const orgNameCheck = () => {
 
 const loadProjects = async (orgID: string) => {
   try {
-    let projectData = await Organization.loadProjects(orgID)
+    let projectData = await OrganizationCRUD.loadProjects(orgID)
     projects.value = []
 
     projectData.project.forEach((element: any) => {
@@ -137,17 +125,18 @@ const loadProjects = async (orgID: string) => {
     })
 
     currentUserId.value = authStore.getUserID()
-  } catch (error) {
+  } catch (error: any) {
     console.log('an error occurred, when loading org projects: ', error.message)
   }
 }
 
 const loadOrg = async (orgID: string) => {
-  let org: CurrentOrg[] = await Organization.getSpecificOrg(orgID)
+  let org = await OrganizationCRUD.getSpecificOrg(orgID)
+  console.log(org)
 
   currentOrg.value = [
     {
-      _id: org._id,
+      orgID: org._id,
       orgName: org.orgName,
       createdByID: org.createdByID,
       ownerID: org.ownerID,
@@ -167,7 +156,7 @@ const loadOrg = async (orgID: string) => {
 
 const getOrgs = async () => {
   organizationsGet.value = []
-  const retrievedOrgs = await Organization.getOrgs()
+  const retrievedOrgs = await OrganizationCRUD.getOrgs()
 
   retrievedOrgs.data.organizations.forEach((org: Org) => {
     organizationsGet.value.push({
@@ -196,28 +185,61 @@ const deleteProjectBoard = (index: number) => {
 }
 
 function startDrag(event: DragEvent, user: User) {
-  console.log('drag started')
-  console.log('Dragged Target: ', event.target)
-  console.log(user)
+  const target = event.target as HTMLElement
+  console.log('Dragged Target 1: ', target)
   event.dataTransfer?.setData('userID', user.id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)
   event.dataTransfer?.setData('user_color', user.color)
 
-  event.target.className += ' hide'
+  //target.className += ' hide'
 }
 
 function endDrop(event: DragEvent) {
-  console.log('drag dropped: ', event.target)
+  let target = event.target as HTMLElement
 
-  const user: User = {
-    _id: event.dataTransfer?.getData('userID'),
-    fName: event.dataTransfer?.getData('user_fName'),
-    lName: event.dataTransfer?.getData('user_lName'),
-    color: event.dataTransfer?.getData('user_color')
+  // find parent container "dragMemberContainer" with data-attribute = "type"
+  while (target && !target.classList.contains('dragMemberContainer')) {
+    target = target.parentElement || null
   }
-  console.log(user)
-  projectMembers.member.push(user)
+
+  const type = target.getAttribute('data-type')
+
+  if (type == '1' && target) {
+    for (let i = 0; i < target.children.length; i++) {
+      const child = target.children[i] as HTMLElement
+
+      console.log(child)
+      if (child.dataset.id == event.dataTransfer?.getData('userID')) {
+        child.classList.remove('hide')
+      }
+    }
+
+    projectMembers.member.map((member, index) => {
+      if (member.id == event.dataTransfer?.getData('userID')) {
+        projectMembers.member.splice(index, 1)
+      }
+    })
+  } else if (type == '2' && target) {
+    const user: User = {
+      id: event.dataTransfer?.getData('userID'),
+      fName: event.dataTransfer?.getData('user_fName'),
+      lName: event.dataTransfer?.getData('user_lName'),
+      color: event.dataTransfer?.getData('user_color')
+    }
+
+    const parentElement = document.querySelector(
+      '.dragMemberContainer[data-type="1"]'
+    ) as HTMLElement
+
+    for (let i = 0; i < parentElement.children.length; i++) {
+      const child = parentElement.children[i] as HTMLElement
+      if (child.dataset.id == event.dataTransfer?.getData('userID')) {
+        child.classList.add('hide')
+      }
+    }
+    projectMembers.member.push(user)
+  }
 }
 
 function addNewProject() {
@@ -493,13 +515,20 @@ onMounted(async () => {
               <span class="text-dark">Project members</span>
             </div>
             <div class="modal_flex_item flex-row">
-              <div class="dragMemberContainer px-1 py-1">
+              <div
+                class="dragMemberContainer px-1 py-1"
+                data-type="1"
+                @drop="endDrop($event)"
+                @dragover.prevent
+                @dragenter.prevent
+              >
                 <div
                   class="avatarContainer"
                   :draggable="true"
                   v-for="member in currentOrg[0].members"
                   :key="member.id"
                   @dragstart="startDrag($event, member)"
+                  :data-id="member.id"
                 >
                   <userAvatar
                     :fName="member.fName"
@@ -510,8 +539,8 @@ onMounted(async () => {
               </div>
 
               <div
-                class="dragMemberContainer px-1"
-                :draggable="true"
+                class="dragMemberContainer px-1 py-1"
+                data-type="2"
                 @drop="endDrop($event)"
                 @dragover.prevent
                 @dragenter.prevent
@@ -520,6 +549,8 @@ onMounted(async () => {
                   class="avatarContainer"
                   v-for="member in projectMembers.member"
                   :key="member.id"
+                  :draggable="true"
+                  @dragstart="startDrag($event, member)"
                 >
                   <userAvatar
                     :fName="member.fName"

@@ -97,37 +97,44 @@
                 </div>
               </div>
 
+              <div class="modal_flex_item flex-row w-100 py-2">
+                <div class="modal_flex_item_title my-auto">
+                  <span class="text-dark">Expected Task Hours</span>
+                </div>
+
+                <div class="modal_flex_item_content d-flex flex-row ms-auto justify-end">
+                  <input
+                    type="text"
+                    maxlength="8"
+                    v-model="updateSingleTask.hoursExpected"
+                    class="form-control w-2/4"
+                    @input="sanitizeInput(1)"
+                  />
+                </div>
+              </div>
+
+              <div class="modal_flex_item flex-row w-100 py-2">
+                <div class="modal_flex_item_title my-auto">
+                  <span class="text-dark">Actual Task Hours</span>
+                </div>
+
+                <div class="modal_flex_item_content d-flex flex-row ms-auto justify-end">
+                  <input
+                    type="text"
+                    maxlength="8"
+                    v-model="updateSingleTask.hoursSpent"
+                    @input="sanitizeInput(2)"
+                    class="form-control w-2/4"
+                  />
+                </div>
+              </div>
+
               <div class="modal_flex_item">
                 <div class="modal_flex_item_title">
                   <span class="text-dark">Label Color</span>
                 </div>
                 <div class="modal_flex_item_content d-flex flex-row">
-                  <div
-                    class="outerBorder_dropdown"
-                    @click="toggleDropdown('isDropdownActive')"
-                    :class="{ show: isDropdownActive }"
-                  >
-                    <div class="dropdown_title clickable">
-                      <span class="text-dark">Select Color</span>
-                    </div>
-                    <div class="dropdown_container d-flex flex-column">
-                      <div v-for="color in availableColors">
-                        <div
-                          class="color_selector clickable"
-                          :class="{
-                            active:
-                              updateSingleTask.labelColor != null &&
-                              color.hex == updateSingleTask.labelColor
-                          }"
-                          @click="setColor(color.value)"
-                        >
-                          <span class="text-dark me-1">{{ color.value }}</span>
-                          <span class="text-dark me-1">{{ color.color }}</span>
-                          <div class="colorBlock" :style="{ backgroundColor: color.hex }"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <v-color-picker id="colorpicker" hide-inputs v-model="taskColor"></v-color-picker>
                 </div>
                 <div class="modal_flex_item">
                   <div class="modal_flex_item_title">
@@ -290,17 +297,18 @@ import { onMounted, ref, reactive } from 'vue'
 import * as projectCRUD from '../components/modules/projectCRUD.js'
 import * as taskCRUD from '../components/modules/taskCRUD.js'
 import type { State } from '../interfaces/i_state'
-import type { User } from '../interfaces/i_singleUser.js'
+import type { SingleUser } from '../interfaces/i_singleUser.js'
 import type { Task } from '../interfaces/i_task.js'
 import userAvatar from '../components/userAvatar.vue'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+import { ListFormat } from 'typescript'
 
 const isShowingModal = ref(false)
 const isShowingEditBoardModal = ref(false)
 const isDropdownActive = ref(false)
 
-const taskMembers: User = reactive({ member: new Array(), taskID: '' })
+const taskMembers: SingleUser = reactive({ member: new Array(), taskID: '' })
 
 const tempBoardHeader = ref('')
 const tempBoardID = ref('')
@@ -316,7 +324,8 @@ const projectID = ref()
 const kanbanBoards = ref([] as State[])
 const singleBoard = ref('null')
 const updateSingleTask = ref([] as Task[])
-const memberInfo = ref([] as User[])
+const memberInfo = ref([] as SingleUser[])
+const taskColor = ref('')
 
 const targetTaskIndex = ref(-1)
 const placeholderTop = ref(0) // Vertical position of the placeholder
@@ -348,8 +357,8 @@ const deleteTask = async (boardIndex, taskIndex) => {
   }
 }
 
-const isMemberInTaskMembers = (member: User) => {
-  const isUserInAssignedToArray = updateSingleTask.value.assignedToID?.some((user) => {
+const isMemberInTaskMembers = (member: SingleUser) => {
+  const isUserInAssignedToArray = updateSingleTask.value.assignedToID.some((user) => {
     return user._id === member._id
   })
 
@@ -358,7 +367,7 @@ const isMemberInTaskMembers = (member: User) => {
 
 const handleDropAvailableUser = (event: DragEvent) => {
 
-  const user: User = {
+  const user: SingleUser = {
     _id: event.dataTransfer?.getData('userID'),
     fName: event.dataTransfer?.getData('user_fName'),
     lName: event.dataTransfer?.getData('user_lName'),
@@ -474,34 +483,6 @@ const loadStates = async (projectID: string) => {
   })
 }
 
-const availableColors = ref([
-  {
-    value: 0,
-    color: 'none',
-    hex: '#FFFFFF'
-  },
-  {
-    value: 1,
-    color: 'lightBlue',
-    hex: '#add8e6'
-  },
-  {
-    value: 2,
-    color: 'lightGreen',
-    hex: '#90ee90'
-  },
-  {
-    value: 3,
-    color: 'lightRed',
-    hex: '#ffb6c1'
-  },
-  {
-    value: 4,
-    color: 'lightYellow',
-    hex: '#fcde9f'
-  }
-])
-
 let dragBoardIndex = -1
 
 const handleDragStart = (boardIndex: number, taskIndex: number, event: DragEvent) => {
@@ -590,6 +571,7 @@ const editTask = (boardIndex: number, taskIndex: number, taskID: string) => {
 
   refBoardIndex.value = boardIndex
   refTaskIndex.value = taskIndex
+  taskColor.value = updateSingleTask.value.labelColor
 
   //taskTitle.value = taskToEdit.taskName
   //taskDescription.value = taskToEdit.description
@@ -643,7 +625,9 @@ const updateTask = async () => {
     taskTitle: updateSingleTask.value.taskTitle,
     taskDescription: updateSingleTask.value.taskDescription,
     assignedToID: updateSingleTask.value.assignedToID,
-    labelColor: updateSingleTask.value.labelColor
+    labelColor: taskColor.value,
+    hoursExpected: updateSingleTask.value.hoursExpected | 0,
+    hoursSpent: updateSingleTask.value.hoursSpent | 0
   }
 
   await taskCRUD.updateSingleTask(data)
@@ -662,34 +646,18 @@ const updateBoard = async () => {
   await projectCRUD.updateSingleProjectBoard(data)
 }
 
-const toggleDropdown = (refVal: string) => {
-
-  switch (refVal) {
-    case 'isDropdownActive':
-      isDropdownActive.value = !isDropdownActive.value
-      break
-
-    default:
-      break
-  }
-}
-
-const setColor = (colorVal: number) => {
-  switch (colorVal) {
+// Sanitize the input value to contain only numeric characters
+// type defines what which input was throwing the event
+const sanitizeInput = (type: number) => {
+  switch (type) {
     case 1:
-      updateSingleTask.value.labelColor = '#add8e6'
+      updateSingleTask.value.hoursExpected = updateSingleTask.value.hoursExpected.replace(/\D/g, '')
       break
     case 2:
-      updateSingleTask.value.labelColor = '#90ee90'
+      updateSingleTask.value.hoursSpent = updateSingleTask.value.hoursSpent.replace(/\D/g, '')
       break
-    case 3:
-      updateSingleTask.value.labelColor = '#ffb6c1'
-      break
-    case 4:
-      updateSingleTask.value.labelColor = '#fcde9f'
-      break
+
     default:
-      updateSingleTask.value.labelColor = '#4b4b4b'
       break
   }
 }
