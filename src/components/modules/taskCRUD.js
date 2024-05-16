@@ -11,8 +11,7 @@ export const updateSingleTask = async (taskData) => {
       body: JSON.stringify(taskData) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
-      .then((data) => {
-      })
+      .then((data) => {})
       .catch((err) => {
         alert(err.message)
       })
@@ -32,8 +31,7 @@ export const deleteSingleTask = async (taskID) => {
       body: JSON.stringify({ taskID: taskID }) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
-      .then((data) => {
-      })
+      .then((data) => {})
       .catch((err) => {
         alert(err.message)
       })
@@ -53,8 +51,7 @@ export const updateTaskPosition = async (taskList) => {
       body: JSON.stringify(taskList) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
-      .then((data) => {
-      })
+      .then((data) => {})
       .catch((err) => {
         alert(err.message)
       })
@@ -77,8 +74,7 @@ export const updateTaskState = async (taskID, newStateID) => {
       }) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
-      .then((data) => {
-      })
+      .then((data) => {})
       .catch((err) => {
         alert(err.message)
       })

@@ -134,7 +134,7 @@ const deleteBoard = (boardID: string, index: number) => {
 }
 
 const deleteProject = async () => {
-  await projectCRUD.deleteProject(props.projectRef[0].id).then(() => {
+  await projectCRUD.deleteProject(props.projectRef[0]._id).then(() => {
     emits('close')
   })
 }

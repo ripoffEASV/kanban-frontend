@@ -31,14 +31,12 @@ const taskDescription = ref('')
 const taskHoursExpected = ref()
 const taskHoursSpent = ref()
 
-const deleteTask = async (boardIndex, taskIndex) => {
+const deleteTask = async (taskID, boardIndex, taskIndex) => {
   try {
-    await taskCRUD
-      .deleteSingleTask(props.kanbanBoards[boardIndex].taskArray[taskIndex].id)
-      .then(() => {
-        props.kanbanBoards[boardIndex].taskArray.splice(taskIndex, 1)
-        emits('close')
-      })
+    await taskCRUD.deleteSingleTask(taskID).then(() => {
+      props.kanbanBoards[boardIndex].taskArray.splice(taskIndex, 1)
+      emits('close')
+    })
   } catch (error: any) {
     console.error({
       title: 'Something went wrong when deleting task',
@@ -288,7 +286,7 @@ const updateTask = async () => {
         <button
           type="button"
           class="btn btn-danger"
-          v-on:click="deleteTask(props.boardIndex, props.taskIndex)"
+          v-on:click="deleteTask(props.singleTask._id, props.boardIndex, props.taskIndex)"
         >
           Delete
         </button>
