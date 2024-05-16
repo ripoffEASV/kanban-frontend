@@ -158,18 +158,6 @@ const dragAndDropState = (event: DragEvent) => {
   if (draggedIndex === null || targetIndex === -1 || draggedIndex === targetIndex) {
     return
   }
-  draggedIndex = index
-  event.dataTransfer?.setData('text/plain', String(index))
-}
-
-const dragAndDropState = (event: DragEvent) => {
-  event.preventDefault()
-  const target = event.target as HTMLElement
-  const targetIndex = hasParentWithId(target)
-
-  if (draggedIndex === null || targetIndex === -1 || draggedIndex === targetIndex) {
-    return
-  }
 
   const draggedBoard = kanbanBoards.value[draggedIndex]
 
