@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineProps } from 'vue'
 import type { User } from '../interfaces/i_user.js'
 import type { State } from '@/interfaces/i_state'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
@@ -23,10 +23,13 @@ const close = () => {
   emits('close')
 }
 
-const tempTaskID = ref()
+const labelColor = ref(props.color)
 
 const taskTitle = ref('')
 const taskDescription = ref('')
+
+const taskHoursExpected = ref()
+const taskHoursSpent = ref()
 
 const deleteTask = async (boardIndex, taskIndex) => {
   try {
@@ -83,6 +86,7 @@ const handleDropWorkingUser = (event: DragEvent) => {
 }
 
 const dragAvailableUser = (event: DragEvent, user) => {
+  console.log(user)
   event.dataTransfer?.setData('userID', user.id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)
@@ -96,10 +100,10 @@ const dragAvailableUserEnd = (index: number) => {}
 const sanitizeInput = (type: number) => {
   switch (type) {
     case 1:
-      props.singleTask.hoursExpected = props.singleTask.hoursExpected.replace(/\D/g, '')
+      taskHoursExpected.value = taskHoursExpected.value.replace(/\D/g, '')
       break
     case 2:
-      props.singleTask.hoursSpent = props.singleTask.hoursSpent.replace(/\D/g, '')
+      taskHoursSpent.value = taskHoursSpent.value.replace(/\D/g, '')
       break
 
     default:
@@ -110,18 +114,16 @@ const sanitizeInput = (type: number) => {
 const updateTask = async () => {
   const data = {
     taskID: props.singleTask._id,
-    taskTitle: props.singleTask.taskTitle,
-    taskDescription: props.singleTask.taskDescription,
+    taskTitle: taskTitle.value,
+    taskDescription: taskDescription.value,
     assignedToID: props.singleTask.assignedToID,
-    labelColor: props.color,
-    hoursExpected: props.singleTask.hoursExpected | 0,
-    hoursSpent: props.singleTask.hoursSpent | 0
+    labelColor: labelColor.value,
+    hoursExpected: taskHoursExpected.value | 0,
+    hoursSpent: taskHoursSpent.value | 0
   }
 
-  await taskCRUD.singleTask(data)
+  await taskCRUD.updateSingleTask(data)
   emits('reload')
-  //await loadStates(projectID.value)
-  //isShowingModal.value = false
 }
 </script>
 <template>
@@ -154,7 +156,12 @@ const updateTask = async () => {
             </div>
 
             <div class="modal_flex_item_content">
-              <input type="text" v-model="props.singleTask.taskTitle" :class="['form-control']" />
+              <input
+                type="text"
+                :placeholder="props.singleTask.taskTitle"
+                v-model="taskTitle"
+                :class="['form-control']"
+              />
             </div>
           </div>
 
@@ -166,7 +173,8 @@ const updateTask = async () => {
             <div class="modal_flex_item_content d-flex flex-row">
               <textarea
                 type="text"
-                v-model="props.singleTask.taskDescription"
+                :placeholder="props.singleTask.taskDescription"
+                v-model="taskDescription"
                 :class="['form-control']"
               />
             </div>
@@ -181,7 +189,8 @@ const updateTask = async () => {
               <input
                 type="text"
                 maxlength="8"
-                v-model="props.singleTask.hoursExpected"
+                :placeholder="props.singleTask.hoursExpected"
+                v-model="taskHoursExpected"
                 class="form-control w-2/4"
                 @input="sanitizeInput(1)"
               />
@@ -197,7 +206,8 @@ const updateTask = async () => {
               <input
                 type="text"
                 maxlength="8"
-                v-model="props.singleTask.hoursSpent"
+                :placeholder="props.singleTask.hoursSpent"
+                v-model="taskHoursSpent"
                 @input="sanitizeInput(2)"
                 class="form-control w-2/4"
               />
@@ -209,7 +219,8 @@ const updateTask = async () => {
               <span class="text-dark">Label Color</span>
             </div>
             <div class="modal_flex_item_content d-flex flex-row">
-              <v-color-picker id="colorpicker" hide-inputs v-model="props.color"></v-color-picker>
+              <v-color-picker hide-inputs v-model="labelColor"></v-color-picker>
+              <!-- <v-color-picker id="colorpicker" hide-inputs v-model="props.color"></v-color-picker> -->
             </div>
             <div class="modal_flex_item">
               <div class="modal_flex_item_title">

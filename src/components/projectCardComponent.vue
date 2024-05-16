@@ -10,6 +10,13 @@ import type { User } from '@/interfaces/i_user'
 
 const router = useRouter()
 
+const emits = defineEmits(['reload'])
+
+const reload = () => {
+  projectRef.value = []
+  emits('reload')
+}
+
 const props = defineProps<{
   project: Project
   orgMembers: User[]
@@ -47,6 +54,7 @@ const closeModal = () => {
   <projectSettings
     :orgMembers="props.orgMembers"
     :projectRef="projectRef"
+    @reload="reload"
     v-if="projectRef.length !== 0"
     @close="closeModal()"
   >

@@ -129,8 +129,15 @@ const closeNewProjectModal = () => {
 }
 
 const reloadProjects = async () => {
-  await loadProjects(currentOrg.value[0].orgID)
-  isShowingNewProjectModal.value = false
+  try {
+    console.log('reloading')
+    await loadProjects(currentOrg.value.orgID).then(() => {
+      console.log('done reloading')
+      isShowingNewProjectModal.value = false
+    })
+  } catch (error: any) {
+    console.error({ title: 'something went wrong when reloading projects', message: error.message })
+  }
 }
 </script>
 
@@ -195,6 +202,7 @@ const reloadProjects = async () => {
               <projectCardComponent
                 :orgMembers="currentOrg.members"
                 :project="project"
+                @reload="reloadProjects"
               ></projectCardComponent>
             </div>
 

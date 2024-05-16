@@ -200,7 +200,7 @@ const loadStates = async (projectID: string) => {
 
     await data.project[0].membersInfo.map(async (member) => {
       memberInfo.value.push({
-        id: member.id,
+        id: member._id,
         email: member.email,
         fName: member.fName,
         lName: member.lName,
@@ -335,7 +335,7 @@ const toggleModalFalse = () => {
 }
 </script>
 
-<style scoped>
+<style>
 /* Add your styles here */
 
 .editBoardModal.show {
@@ -427,10 +427,5 @@ const toggleModalFalse = () => {
 
 .draggable_wrapper {
   margin: 0.25rem;
-}
-
-.userAvatarIteration {
-  width: 36px;
-  height: 36px;
 }
 </style>

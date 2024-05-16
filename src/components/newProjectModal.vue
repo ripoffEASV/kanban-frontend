@@ -129,9 +129,7 @@ const props = defineProps<{
   org: Organization
 }>()
 
-onMounted(() => {
-  console.log(props.org)
-})
+
 
 const emits = defineEmits(['close', 'reload'])
 

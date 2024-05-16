@@ -18,7 +18,7 @@
               type="text"
               class="form-control"
               v-model="newBoardName"
-              :placeholder="singleBoard.stateName"
+              :placeholder="props.singleBoard.stateName"
             />
           </div>
         </div>
@@ -28,7 +28,7 @@
             <span class="text-dark">Tasks in board:</span>
           </div>
           <div class="modal_flex_item">
-            <div v-for="(task, index) in singleBoard.taskArray">
+            <div v-for="(task, index) in props.singleBoard.taskArray">
               <span class="me-1 text-dark">{{ index + 1 }}:</span>
               <span class="text-dark">{{ task.taskTitle }}</span>
             </div>
@@ -63,7 +63,7 @@ import { ref } from 'vue'
 import * as projectCRUD from '../components/modules/projectCRUD'
 
 const newBoardName = ref()
-const tempTaskArray = ref([] as Task[])
+const tempTaskArray = ref([] as any[])
 
 const tempTaskname = ref('')
 
@@ -94,9 +94,7 @@ const updateBoard = async () => {
   }
 
   await projectCRUD.updateSingleProjectBoard(data)
-  newBoardName.value = ''
-  tempTaskArray.value = ''
-  emits('reload')
+  
 }
 
 const addTaskToBoard = () => {
