@@ -12,13 +12,12 @@ export const updateSingleTask = async (taskData) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('Done')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -34,13 +33,12 @@ export const deleteSingleTask = async (taskID) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log('Task Deleted')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -56,13 +54,12 @@ export const updateTaskPosition = async (taskList) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log('Task Deleted')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -81,12 +78,11 @@ export const updateTaskState = async (taskID, newStateID) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log('Task Deleted')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }

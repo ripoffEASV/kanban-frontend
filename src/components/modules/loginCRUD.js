@@ -76,7 +76,6 @@ export default function userCrud() {
 
       if (response.ok) {
         authStore.logout();
-        console.log('Logged out successfully');
       } else {
         console.error('Failed to log out');
       }
@@ -136,7 +135,7 @@ export default function userCrud() {
         return false;
       }
     } catch (err) {
-      console.log('Error failed to delete user', err);
+      console.error('Error failed to delete user', err);
       return false;
     }
   }

@@ -130,9 +130,7 @@ const closeNewProjectModal = () => {
 
 const reloadProjects = async () => {
   try {
-    console.log('reloading')
     await loadProjects(currentOrg.value.orgID).then(() => {
-      console.log('done reloading')
       isShowingNewProjectModal.value = false
     })
   } catch (error: any) {
@@ -238,7 +236,7 @@ const reloadProjects = async () => {
   >
     <OrganizationSettings
       v-if="isShowingOrgChangeModal"
-      :org="currentOrg[0]"
+      :org="currentOrg"
       @closeSettingsModal="toggleOrgSettingsModal"
       @get-orgs="getOrgs"
     >

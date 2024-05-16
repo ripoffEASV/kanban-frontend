@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref } from 'vue'
 import userCrud from './modules/loginCRUD'
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import { log } from 'console';
-import router from '@/router';
+import 'bootstrap-icons/font/bootstrap-icons.css'
+import router from '@/router'
 
-const { signUpUser } = userCrud();
+const { signUpUser } = userCrud()
 
-const passwordsMatch = computed(() => formData.value.password === formData.value.repeatPassword);
+const passwordsMatch = computed(() => formData.value.password === formData.value.repeatPassword)
 
 // Reactive state
 const formData = ref({
@@ -17,26 +16,31 @@ const formData = ref({
   email: '',
   password: '',
   repeatPassword: ''
-});
+})
 
 // Method
 async function submitForm() {
-  await signUpUser(formData.value.firstName, formData.value.lastName, formData.value.username, formData.value.email, formData.value.password)
-  .then((success) => {
+  await signUpUser(
+    formData.value.firstName,
+    formData.value.lastName,
+    formData.value.username,
+    formData.value.email,
+    formData.value.password
+  ).then((success) => {
     if (success) {
-      router.push('/login');
+      router.push('/login')
     }
   })
 }
 
 const showPassword = ref({
   password: false,
-  confirmPassword: false,
-});
+  confirmPassword: false
+})
 
 const togglePasswordVisibility = (fieldName) => {
-  showPassword.value[fieldName] = !showPassword.value[fieldName];
-};
+  showPassword.value[fieldName] = !showPassword.value[fieldName]
+}
 </script>
 
 <template>
@@ -46,39 +50,67 @@ const togglePasswordVisibility = (fieldName) => {
       <section class="namesContainer">
         <div class="form-group">
           <label for="fName">First name:</label>
-          <input type="text" id="fName" v-model="formData.firstName" required>
+          <input type="text" id="fName" v-model="formData.firstName" required />
         </div>
         <div class="form-group">
           <label for="lName">Last name:</label>
-          <input type="text" id="lName" v-model="formData.lastName" required>
+          <input type="text" id="lName" v-model="formData.lastName" required />
         </div>
       </section>
       <div class="form-group">
         <label for="username">Username:</label>
-        <input type="text" id="username" v-model="formData.username" required>
+        <input type="text" id="username" v-model="formData.username" required />
       </div>
       <div class="form-group">
         <label for="email">Email:</label>
-        <input type="email" id="email" v-model="formData.email" required>
+        <input type="email" id="email" v-model="formData.email" required />
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
         <section class="d-flex flex-row position-relative">
-          <input autocomplete="new-password" :type="showPassword.password  ? 'text' : 'password'" id="password" v-model="formData.password" required minlength="3">
-          <div class="position-absolute eyePos" type="button" @click="togglePasswordVisibility('password')">
-            <i :class="showPassword.password ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'" class="text-black"></i>
+          <input
+            autocomplete="new-password"
+            :type="showPassword.password ? 'text' : 'password'"
+            id="password"
+            v-model="formData.password"
+            required
+            minlength="3"
+          />
+          <div
+            class="position-absolute eyePos"
+            type="button"
+            @click="togglePasswordVisibility('password')"
+          >
+            <i
+              :class="showPassword.password ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"
+              class="text-black"
+            ></i>
           </div>
         </section>
       </div>
       <div class="form-group position-relative">
         <label for="newPassword">Confirm password:</label>
         <section class="d-flex flex-row position-relative">
-          <input autocomplete="new-password" :type="showPassword.confirmPassword ? 'text' : 'password'" id="newPassword" v-model="formData.repeatPassword" required minlength="3">
-          <div class="position-absolute eyePos" type="button" @click="togglePasswordVisibility('confirmPassword')">
-            <i :class="showPassword.confirmPassword ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'" class="text-black"></i>
+          <input
+            autocomplete="new-password"
+            :type="showPassword.confirmPassword ? 'text' : 'password'"
+            id="newPassword"
+            v-model="formData.repeatPassword"
+            required
+            minlength="3"
+          />
+          <div
+            class="position-absolute eyePos"
+            type="button"
+            @click="togglePasswordVisibility('confirmPassword')"
+          >
+            <i
+              :class="showPassword.confirmPassword ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"
+              class="text-black"
+            ></i>
           </div>
         </section>
-        
+
         <div v-if="!passwordsMatch" class="errorMessage position-absolute">
           Passwords do not match.
         </div>
@@ -139,7 +171,7 @@ button:hover {
   right: 0;
 }
 .text-black {
-  color:black
+  color: black;
 }
 .eyePos {
   top: 50%;

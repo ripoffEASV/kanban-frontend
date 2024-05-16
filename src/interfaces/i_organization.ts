@@ -4,7 +4,7 @@ export interface Organization {
   orgName: string
   createdByID: string
   ownerID: string[]
-  orgMembers?: string[]
+  orgMembers?: User[]
   projectIDs?: string[]
   inviteArray?: string[]
   owner?: User[]

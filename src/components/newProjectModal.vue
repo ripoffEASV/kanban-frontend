@@ -126,10 +126,8 @@ const projectMembers: any = reactive({ member: new Array() })
 const inputProjectName = ref()
 
 const props = defineProps<{
-  org: Organization
+  org: any
 }>()
-
-
 
 const emits = defineEmits(['close', 'reload'])
 
@@ -139,7 +137,6 @@ const addProjectBoard = (title: String) => {
 }
 
 const deleteProjectBoard = (index: number) => {
-  console.log(index)
   projectBoards.boards.splice(index, 1)
 }
 

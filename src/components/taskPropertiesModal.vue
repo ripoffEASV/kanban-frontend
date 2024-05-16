@@ -10,7 +10,7 @@ import userAvatar from '../components/userAvatar.vue'
 
 const props = defineProps<{
   singleTask: any
-  kanbanBoards: State
+  kanbanBoards: any
   boardIndex: number
   taskIndex: number
   color: string
@@ -86,7 +86,6 @@ const handleDropWorkingUser = (event: DragEvent) => {
 }
 
 const dragAvailableUser = (event: DragEvent, user) => {
-  console.log(user)
   event.dataTransfer?.setData('userID', user.id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)

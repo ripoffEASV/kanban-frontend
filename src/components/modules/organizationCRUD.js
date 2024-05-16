@@ -95,9 +95,8 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
         alert(err.message)
       })
 
-    //console.log(data)
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -106,7 +105,7 @@ export const loadProjects = async (orgID) => {
     const projects = await fetch(baseURL + 'projects/getProjects/' + orgID)
     return await projects.json()
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -130,7 +129,7 @@ export const updateOrganization = async (organization) => {
     const data = await response.json()
     return { message: 'found orgs', data: data }
   } catch (err) {
-    console.log(err)
+    console.error(err)
   }
 }
 
@@ -149,6 +148,6 @@ export const deleteOrganization = async (orgId) => {
     const data = await response.json()
     return { message: 'Deleted org', data }
   } catch (err) {
-    console.log(err)
+    console.error(err)
   }
 }
