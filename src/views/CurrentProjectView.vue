@@ -140,6 +140,11 @@ function hasParentWithId(element: HTMLElement): number {
 }
 
 const onDragStateStart = (event: DragEvent, index: number) => {
+  const target = event.target as HTMLElement;
+
+  if (!target.id.includes('kanbanStateBoard')) {
+    return;
+  }
   draggedIndex = index
   event.dataTransfer?.setData('text/plain', String(index))
 }
