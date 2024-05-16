@@ -1,7 +1,7 @@
-import * as GLOBAL from '../Globals/GLOBALS'
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const addNewOrganization = async (orgName, inviteArr) => {
-  await fetch(GLOBAL.URL + 'organizations/addNewOrganization', {
+  await fetch(baseURL + 'organizations/addNewOrganization', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     headers: {
       'content-type': 'application/json'
@@ -27,7 +27,7 @@ export const addNewOrganization = async (orgName, inviteArr) => {
 
 export const getOrgs = async () => {
   try {
-    const response = await fetch(GLOBAL.URL + 'organizations/getOrganizationsFromID', {
+    const response = await fetch(baseURL + 'organizations/getOrganizationsFromID', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ export const getOrgs = async () => {
 
 export const getSpecificOrg = async (orgID) => {
   try {
-    const response = await fetch(GLOBAL.URL + 'organizations/getSpecificOrg/' + orgID, {
+    const response = await fetch(baseURL + 'organizations/getSpecificOrg/' + orgID, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
       orgID: orgID
     }
 
-    await fetch(GLOBAL.URL + 'projects/addNewProject', {
+    await fetch(baseURL + 'projects/addNewProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -103,7 +103,7 @@ export const addNewProject = async (ProjectName, projectBoards, projectMembers, 
 
 export const loadProjects = async (orgID) => {
   try {
-    const projects = await fetch(GLOBAL.URL + 'projects/getProjects/' + orgID)
+    const projects = await fetch(baseURL + 'projects/getProjects/' + orgID)
     return await projects.json()
   } catch (error) {
     console.log(error)
@@ -113,7 +113,7 @@ export const loadProjects = async (orgID) => {
 export const updateOrganization = async (organization) => {
   try {
     const response = await fetch(
-      GLOBAL.URL + 'organizations/updateOrganization/' + organization.orgID,
+      baseURL + 'organizations/updateOrganization/' + organization.orgID,
       {
         method: 'POST',
         headers: {
@@ -136,7 +136,7 @@ export const updateOrganization = async (organization) => {
 
 export const deleteOrganization = async (orgId) => {
   try {
-    const response = await fetch(GLOBAL.URL + 'organizations/delete-org/' + orgId, {
+    const response = await fetch(baseURL + 'organizations/delete-org/' + orgId, {
       method: 'GET',
       headers: {
         'content-type': 'application/json'

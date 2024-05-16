@@ -1,8 +1,8 @@
-import * as GLOBAL from '../Globals/GLOBALS'
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const updateSingleTask = async (taskData) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/updateSingleTask', {
+    await fetch(baseURL + 'tasks/updateSingleTask', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -24,7 +24,7 @@ export const updateSingleTask = async (taskData) => {
 
 export const deleteSingleTask = async (taskID) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/deleteSingleTask', {
+    await fetch(baseURL + 'tasks/deleteSingleTask', {
       method: 'DELETE', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -46,7 +46,7 @@ export const deleteSingleTask = async (taskID) => {
 
 export const updateTaskPosition = async (taskList) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/updateTaskPosition', {
+    await fetch(baseURL + 'tasks/updateTaskPosition', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -68,7 +68,7 @@ export const updateTaskPosition = async (taskList) => {
 
 export const updateTaskState = async (taskID, newStateID) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/updateTaskState', {
+    await fetch(baseURL + 'tasks/updateTaskState', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'

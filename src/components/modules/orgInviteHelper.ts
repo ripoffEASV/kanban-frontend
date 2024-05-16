@@ -1,60 +1,61 @@
-import * as GLOBAL from '../Globals/GLOBALS'
-import type { Invitation } from '../../interfaces/i_invitation';
-import { useInvitationStore } from '../../stores/invitationStore';
+const baseURL = import.meta.env.VITE_API_URL
+import type { Invitation } from '../../interfaces/i_invitation'
+import { useInvitationStore } from '../../stores/invitationStore'
 
 export default function orgInvites() {
-    const { setInvitations } = useInvitationStore();
+  const { setInvitations } = useInvitationStore()
 
-    const numberOfInvites = async () => {
-        try {
-            const response = await fetch(GLOBAL.URL + 'organizations/check-user-invites', {
-                method: 'GET',
-                credentials: 'include'
-            });
+  const numberOfInvites = async () => {
+    console.log(baseURL)
+    try {
+      const response = await fetch(baseURL + 'organizations/check-user-invites', {
+        method: 'GET',
+        credentials: 'include'
+      })
 
-            if (!response.ok) {
-                // console.error('Failed to fetch organization invites for user');
-                return;
-            }
+      if (!response.ok) {
+        // console.error('Failed to fetch organization invites for user');
+        return
+      }
 
-            const invitations = await response.json();
-            setInvitations(invitations);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
+      const invitations = await response.json()
+      setInvitations(invitations)
+    } catch (error) {
+      console.error('Error fetching data:', error)
     }
+  }
 
-    const acceptInvite = async (orgID) => {
-        try {
-            const response = await fetch(GLOBAL.URL + 'organizations/accept-org-inv/' + orgID, {
-                method: 'GET',
-                credentials: 'include'
-            });
+  const acceptInvite = async (orgID) => {
+    try {
+      const response = await fetch(baseURL + 'organizations/accept-org-inv/' + orgID, {
+        method: 'GET',
+        credentials: 'include'
+      })
 
-            if (!response.ok) {
-                return;
-            }
-            numberOfInvites();
-        } catch(err) {
-            console.error(err);
-        }
+      if (!response.ok) {
+        return
+      }
+      numberOfInvites()
+    } catch (err) {
+      console.error(err)
     }
+  }
 
-    const declineInvite = async (orgID) => {
-        try {
-            const response = await fetch(GLOBAL.URL + 'organizations/decline-org-inv/' + orgID, {
-                method: 'GET',
-                credentials: 'include'
-            });
+  const declineInvite = async (orgID) => {
+    try {
+      const response = await fetch(baseURL + 'organizations/decline-org-inv/' + orgID, {
+        method: 'GET',
+        credentials: 'include'
+      })
 
-            if (!response.ok) {
-                return;
-            }
-            numberOfInvites();
-        } catch (err) {
-            console.error(err);
-        }
+      if (!response.ok) {
+        return
+      }
+      numberOfInvites()
+    } catch (err) {
+      console.error(err)
     }
+  }
 
-    return { numberOfInvites, acceptInvite, declineInvite };
+  return { numberOfInvites, acceptInvite, declineInvite }
 }
