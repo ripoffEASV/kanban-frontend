@@ -8,7 +8,7 @@ import * as projectCRUD from './modules/projectCRUD'
 
 const props = defineProps<{
   orgMembers: User[]
-  projectRef: Project
+  projectRef: any
 }>()
 
 const tempBoardName = ref('')
@@ -18,8 +18,7 @@ const assignedMembers = ref([] as any[])
 const newProjectName = ref('')
 
 onMounted(() => {
-  props.projectRef[0].projectStates?.forEach((board: State) => {
-    console.log(board)
+  props.projectRef[0].projectStates?.forEach((board) => {
     projectBoards.value.push({
       id: board._id,
       stateName: board.stateName,
@@ -52,11 +51,8 @@ const handleDropAvailableUser = (event: DragEvent) => {
     color: event.dataTransfer?.getData('user_color')
   }
 
-  console.log('dropped available user: ', user)
-
   assignedMembers.value.push(user)
   // props.orgMembers.some((user, index) => {
-  //   console.log(index, user)
   //   if (user.id == event.dataTransfer?.getData('userID')) {
   //     assignedMembers.value.splice(index, 1)
   //   }
@@ -76,7 +72,6 @@ const handleDropWorkingUser = (event: DragEvent) => {
     // Parent node with the class 'available' was found
 
     const userID = event.dataTransfer?.getData('userID')
-    console.log('dropped userID: ', userID)
 
     assignedMembers.value.some((user, index) => {
       if (user.id == userID) {
@@ -103,10 +98,6 @@ const updateProjectCRUD = async () => {
       newBoards: projectBoards.value,
       newMembers: assignedMembers.value
     }
-
-    //props.projectRef[0].membersInfo = assignedMembers.value
-
-    console.log(data)
 
     await projectCRUD.updateProjectData(data).then(() => {
       emits('reload')

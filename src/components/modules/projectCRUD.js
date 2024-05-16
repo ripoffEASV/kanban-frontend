@@ -21,19 +21,17 @@ export const updateSingleProjectBoard = async (boardData) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('Done')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const getProjectData = async (projectID) => {
   try {
-    console.log(projectID)
 
     const projectData = await fetch(GLOBAL.URL + 'projects/getSingleProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -48,7 +46,7 @@ export const getProjectData = async (projectID) => {
 
     return projectData.json()
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -65,7 +63,7 @@ export const updateProjectData = async (projectData) => {
       alert(err.message)
     })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -82,7 +80,7 @@ export const deleteProject = async (projectID) => {
       console.error(err.message)
     })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 

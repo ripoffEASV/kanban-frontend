@@ -14,7 +14,7 @@
         :id="'kanbanStateBoard' + (boardIndex + 1)"
       >
         <div class="kanban_outerBorder">
-          <h2 class="kanban_title" @dblclick="editBoard(board.stateID, board.stateName)">
+          <h2 class="kanban_title" @dblclick="editBoard(board.id, board.stateName)">
             {{ board.stateName }}
           </h2>
           <div class="separator"></div>
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <div v-if="updateSingleTask.value != 'null'">
+  <div v-if="updateSingleTask.taskTitle != 'null'">
     <div
       class="modal fade taskModal"
       :class="{ show: isShowingModal }"
@@ -97,17 +97,17 @@ import type { User } from '@/interfaces/i_user'
 const isShowingModal = ref(false)
 const isShowingEditBoardModal = ref(false)
 
-const taskMembers: User = reactive({ member: new Array(), taskID: '' })
+const taskMembers: any = reactive({ member: new Array(), taskID: '' })
 
 const tempBoardHeader = ref('')
 const tempBoardID = ref('')
 const refBoardIndex = ref(-1)
 const refTaskIndex = ref(-1)
 const projectID = ref()
-const kanbanBoards = ref([] as State[])
+const kanbanBoards = ref([] as any[])
 const singleBoard = ref('null')
 const updateSingleTask = ref([] as any[])
-const memberInfo = ref([] as User[])
+const memberInfo = ref([] as any[])
 const taskColor = ref('')
 
 const targetTaskIndex = ref(-1)

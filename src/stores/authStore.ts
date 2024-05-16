@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function login(user: User) {
+  function login(user) {
     setUserID(user.id)
     checkLogin()
     setLoggedInUser(user)
