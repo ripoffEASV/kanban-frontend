@@ -14,7 +14,7 @@
         :id="'kanbanStateBoard' + (boardIndex + 1)"
       >
         <div class="kanban_outerBorder">
-          <h2 class="kanban_title" @dblclick="editBoard(board.id, board.stateName)">
+          <h2 class="kanban_title" @dblclick="editBoard(board)">
             {{ board.stateName }}
           </h2>
           <div class="separator"></div>
@@ -315,20 +315,20 @@ const editTask = (boardIndex: number, taskIndex: number, taskID: string) => {
   isShowingModal.value = true
 }
 
-const editBoard = (boardID: string, boardName: string) => {
+const editBoard = (board: any) => {
+  console.log(board);
   isShowingEditBoardModal.value = true
-  //
-  let tempIndex = kanbanBoards.value.findIndex((board) => {
-    console.log(boardID, board.stateID)
-    return board.stateID === boardID
+
+  let tempIndex = kanbanBoards.value.findIndex((b) => {
+    return b.stateID === board.stateID
   })
-  console.log(tempIndex)
+
+  console.log(tempIndex);
 
   singleBoard.value = kanbanBoards.value[tempIndex]
-  console.log(singleBoard.value)
 
-  tempBoardHeader.value = boardName
-  tempBoardID.value = boardID
+  tempBoardHeader.value = board.stateName
+  tempBoardID.value = board.stateID
 }
 
 const closeTaskModal = () => {
