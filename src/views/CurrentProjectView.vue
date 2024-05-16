@@ -1,13 +1,20 @@
 <template>
   <div class="kanban_Page_Container">
-    <div class="kanban_scrollable_container d-flex flex-row w-100 align-items-center"
-                  @dragover.prevent
-                  @drop="dragAndDropState($event)">
-      <div class="kanbanBoard_State" v-for="(board, boardIndex) in kanbanBoards" :key="boardIndex"
-                        draggable="true"
-                        @dragstart="onDragStateStart($event, boardIndex)" :id="'kanbanStateBoard' + (boardIndex + 1)">
+    <div
+      class="kanban_scrollable_container d-flex flex-row w-100 align-items-center"
+      @dragover.prevent
+      @drop="dragAndDropState($event)"
+    >
+      <div
+        class="kanbanBoard_State"
+        v-for="(board, boardIndex) in kanbanBoards"
+        :key="boardIndex"
+        draggable="true"
+        @dragstart="onDragStateStart($event, boardIndex)"
+        :id="'kanbanStateBoard' + (boardIndex + 1)"
+      >
         <div class="kanban_outerBorder">
-          <h2 class="kanban_title" @dblclick="editBoard(board.stateID, board.stateName)">
+          <h2 class="kanban_title" @dblclick="editBoard(board.id, board.stateName)">
             {{ board.stateName }}
           </h2>
           <div class="separator"></div>
@@ -26,11 +33,10 @@
                 draggable="true"
                 @dragstart="handleDragStart(boardIndex, taskIndex, $event)"
                 @dragend="handleDragEnd"
-                @dblclick="editTask(boardIndex, taskIndex, task._id)"
+                @dblclick="editTask(boardIndex, taskIndex, task.id)"
                 :id="'task_' + boardIndex + '_' + taskIndex"
               >
-                <h4 :style="{ backgroundColor: task.labelColor }">{{ task.taskTitle }}</h4>
-                <!-- <p>{{ task.description }}</p> -->
+                <TaskComponent :title="task.taskTitle" :color="task.labelColor"></TaskComponent>
               </li>
             </ul>
           </div>
@@ -39,182 +45,24 @@
     </div>
   </div>
 
-  <div v-if="updateSingleTask.value != 'null'">
+  <div v-if="updateSingleTask.taskTitle != 'null'">
     <div
       class="modal fade taskModal"
       :class="{ show: isShowingModal }"
       tabindex="-1"
       aria-labelledby="NewOrganizationModal"
     >
-      <div class="modal-dialog my-auto">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title pe-3 text-dark">Update task properties</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              v-on:click="toggleModalFalse"
-            ></button>
-          </div>
-          <div class="modal-body d-flex flex-column taskModalBody px-0">
-            <OverlayScrollbarsComponent style="padding: 1rem">
-              <!-- <div class="modal_flex_item">
-            <div class="modal_flex_item_title">
-              <span class="text-dark">Task Description</span>
-            </div>
-            <div class="modal_flex_item_title pb-2">
-              <span class="text-dark">{{ taskDescription }}</span>
-            </div>
-          </div> -->
-
-              <div class="modal_flex_item">
-                <div class="modal_flex_item_title">
-                  <span class="text-dark">Task Title</span>
-                </div>
-
-                <div class="modal_flex_item_content">
-                  <input
-                    type="text"
-                    v-model="updateSingleTask.taskTitle"
-                    :class="['form-control']"
-                  />
-                </div>
-              </div>
-
-              <div class="modal_flex_item">
-                <div class="modal_flex_item_title">
-                  <span class="text-dark">Task Description</span>
-                </div>
-
-                <div class="modal_flex_item_content d-flex flex-row">
-                  <textarea
-                    type="text"
-                    v-model="updateSingleTask.taskDescription"
-                    :class="['form-control']"
-                  />
-                </div>
-              </div>
-
-              <div class="modal_flex_item flex-row w-100 py-2">
-                <div class="modal_flex_item_title my-auto">
-                  <span class="text-dark">Expected Task Hours</span>
-                </div>
-
-                <div class="modal_flex_item_content d-flex flex-row ms-auto justify-end">
-                  <input
-                    type="text"
-                    maxlength="8"
-                    v-model="updateSingleTask.hoursExpected"
-                    class="form-control w-2/4"
-                    @input="sanitizeInput(1)"
-                  />
-                </div>
-              </div>
-
-              <div class="modal_flex_item flex-row w-100 py-2">
-                <div class="modal_flex_item_title my-auto">
-                  <span class="text-dark">Actual Task Hours</span>
-                </div>
-
-                <div class="modal_flex_item_content d-flex flex-row ms-auto justify-end">
-                  <input
-                    type="text"
-                    maxlength="8"
-                    v-model="updateSingleTask.hoursSpent"
-                    @input="sanitizeInput(2)"
-                    class="form-control w-2/4"
-                  />
-                </div>
-              </div>
-
-              <div class="modal_flex_item">
-                <div class="modal_flex_item_title">
-                  <span class="text-dark">Label Color</span>
-                </div>
-                <div class="modal_flex_item_content d-flex flex-row">
-                  <v-color-picker id="colorpicker" hide-inputs v-model="taskColor"></v-color-picker>
-                </div>
-                <div class="modal_flex_item">
-                  <div class="modal_flex_item_title">
-                    <span class="text-dark">Members</span>
-                  </div>
-                  <div class="modal_flex_item_content d-flex flex-row">
-                    <div class="col-5 d-flex flex-column">
-                      <span class="text-secondary">Available:</span>
-                      <div
-                        class="user_drag_container available"
-                        @dragover.prevent
-                        @drop="handleDropWorkingUser($event)"
-                      >
-                        <div class="userAvatarIteration" v-for="(member, index) in memberInfo">
-                          <div v-if="!isMemberInTaskMembers(member)">
-                            <div
-                              class="draggable_wrapper"
-                              draggable="true"
-                              @dragstart="dragAvailableUser($event, member)"
-                              @dragend="dragAvailableUserEnd(index)"
-                            >
-                              <userAvatar
-                                :data-userid="member._id"
-                                :fName="member.fName"
-                                :lName="member.lName"
-                                :color="member.color"
-                              ></userAvatar>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-5 d-flex flex-column ms-auto">
-                      <span class="text-secondary">Working:</span>
-                      <div
-                        class="user_drag_container working"
-                        @dragover.prevent
-                        @drop="handleDropAvailableUser($event)"
-                      >
-                        <div
-                          class="userAvatarIteration"
-                          v-for="(member, index) in updateSingleTask.assignedToID"
-                        >
-                          <div
-                            class="draggable_wrapper"
-                            draggable="true"
-                            @dragstart="dragAvailableUser($event, member)"
-                            @dragend="dragAvailableUserEnd(index)"
-                          >
-                            <userAvatar
-                              :data-userid="member._id"
-                              :fName="member.fName"
-                              :lName="member.lName"
-                              :color="member.color"
-                            ></userAvatar>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </OverlayScrollbarsComponent>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-danger"
-              v-on:click="deleteTask(refBoardIndex, refTaskIndex)"
-            >
-              Delete
-            </button>
-
-            <button type="button" v-on:click="toggleModalFalse" class="btn btn-secondary">
-              Close
-            </button>
-            <button type="button" v-on:click="updateTask()" class="btn btn-primary">Update</button>
-          </div>
-        </div>
-      </div>
+      <taskPropertiesModal
+        :kanbanBoards="kanbanBoards"
+        :singleTask="updateSingleTask"
+        :color="taskColor"
+        :members="memberInfo"
+        :taskMembers="taskMembers"
+        :boardIndex="refBoardIndex"
+        :taskIndex="refTaskIndex"
+        @close="closeTaskModal"
+        @reload="reloadPage"
+      ></taskPropertiesModal>
     </div>
   </div>
 
@@ -225,69 +73,11 @@
       tabindex="-1"
       aria-labelledby="editBoardModal"
     >
-      <div class="modal-dialog my-auto">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title pe-3 text-dark">Update Board properties</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              v-on:click="toggleModalFalse"
-            ></button>
-          </div>
-          <div class="modal-body d-flex flex-column">
-            <div class="modal_flex_item">
-              <div class="modal_flex_item_title">
-                <input
-                  type="text"
-                  class="form-control"
-                  v-model="newBoardName"
-                  :placeholder="singleBoard.stateName"
-                />
-              </div>
-            </div>
-
-            <div class="modal_flex_item">
-              <div class="modal_flex_item_title">
-                <span class="text-dark">Tasks in board:</span>
-              </div>
-              <div class="modal_flex_item">
-                <div v-for="(task, index) in singleBoard.taskArray">
-                  <span class="me-1 text-dark">{{ index + 1 }}:</span>
-                  <span class="text-dark">{{ task.taskTitle }}</span>
-                </div>
-
-                <div class="seperator"></div>
-              </div>
-
-              <div class="modal_flex_item flex-row">
-                <input type="text" class="form-control me-1" v-model="tempTaskname" />
-                <button
-                  type="button"
-                  class="btn btn-outline-success"
-                  @click="addTaskToBoard(singleBoard.stateID)"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" v-on:click="toggleModalFalse" class="btn btn-secondary">
-              Close
-            </button>
-            <button
-              type="button"
-              v-on:click="updateBoard(singleBoard.stateID)"
-              class="btn btn-primary"
-            >
-              Update
-            </button>
-          </div>
-        </div>
-      </div>
+      <editBoardModal
+        :singleBoard="singleBoard"
+        @close="closeEditBoardModal"
+        @reload="reloadPage"
+      ></editBoardModal>
     </div>
   </div>
 </template>
@@ -297,34 +87,27 @@ import { onMounted, ref, reactive } from 'vue'
 import * as projectCRUD from '../components/modules/projectCRUD.js'
 import * as taskCRUD from '../components/modules/taskCRUD.js'
 import type { State } from '../interfaces/i_state'
-import type { SingleUser } from '../interfaces/i_singleUser.js'
-import type { Task } from '../interfaces/i_task.js'
-import userAvatar from '../components/userAvatar.vue'
-import 'overlayscrollbars/overlayscrollbars.css'
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
-import { ListFormat } from 'typescript'
+
+import taskPropertiesModal from '@/components/taskPropertiesModal.vue'
+import editBoardModal from '@/components/editBoardModal.vue'
+
+import TaskComponent from '@/components/taskComponent.vue'
+import type { User } from '@/interfaces/i_user'
 
 const isShowingModal = ref(false)
 const isShowingEditBoardModal = ref(false)
-const isDropdownActive = ref(false)
 
-const taskMembers: SingleUser = reactive({ member: new Array(), taskID: '' })
+const taskMembers: any = reactive({ member: new Array(), taskID: '' })
 
 const tempBoardHeader = ref('')
 const tempBoardID = ref('')
-const tempTaskname = ref('')
-const newBoardName = ref()
-const tempTaskID = ref()
-
-const taskTitle = ref('')
-const taskDescription = ref('')
 const refBoardIndex = ref(-1)
 const refTaskIndex = ref(-1)
 const projectID = ref()
-const kanbanBoards = ref([] as State[])
+const kanbanBoards = ref([] as any[])
 const singleBoard = ref('null')
-const updateSingleTask = ref([] as Task[])
-const memberInfo = ref([] as SingleUser[])
+const updateSingleTask = ref([] as any[])
+const memberInfo = ref([] as any[])
 const taskColor = ref('')
 
 const targetTaskIndex = ref(-1)
@@ -332,148 +115,92 @@ const placeholderTop = ref(0) // Vertical position of the placeholder
 const isDragging = ref(false) // Whether a task is being dragged
 const dragTaskIndex = ref(-1) // Index of the dragged task
 
-let draggedIndex: number | null = null;
+let draggedIndex: number | null = null
 
-onMounted(async () => {
+onMounted(() => {
+  reloadPage()
+})
+
+const reloadPage = async () => {
+  toggleModalFalse()
   const urlParams = new URLSearchParams(window.location.search)
   projectID.value = urlParams.get('project')
   loadStates(projectID.value)
-})
-
-const deleteTask = async (boardIndex, taskIndex) => {
-  try {
-
-    await taskCRUD
-      .deleteSingleTask(kanbanBoards.value[boardIndex].taskArray[taskIndex]._id)
-      .then(() => {
-        kanbanBoards.value[boardIndex].taskArray.splice(taskIndex, 1)
-        toggleModalFalse()
-      })
-  } catch (error: any) {
-    console.error({
-      title: 'Something went wrong when deleting task',
-      message: error.message
-    })
-  }
-}
-
-const isMemberInTaskMembers = (member: SingleUser) => {
-  const isUserInAssignedToArray = updateSingleTask.value.assignedToID.some((user) => {
-    return user._id === member._id
-  })
-
-  return isUserInAssignedToArray
-}
-
-const handleDropAvailableUser = (event: DragEvent) => {
-
-  const user: SingleUser = {
-    _id: event.dataTransfer?.getData('userID'),
-    fName: event.dataTransfer?.getData('user_fName'),
-    lName: event.dataTransfer?.getData('user_lName'),
-    color: event.dataTransfer?.getData('user_color')
-  }
-  taskMembers.member.push(user)
-  updateSingleTask.value.assignedToID.push(user)
-}
-
-const handleDropWorkingUser = (event: DragEvent) => {
-  const target = event.target as HTMLElement
-
-  if (target.classList.contains('available')) {
-    const userID = event.dataTransfer?.getData('userID')
-
-    updateSingleTask.value.assignedToID.some((user, index) => {
-      if (user._id == userID) {
-        updateSingleTask.value.assignedToID.splice(index, 1)
-      }
-    })
-  }
 }
 
 function hasParentWithId(element: HTMLElement): number {
   while (element) {
-    const match = element.id.match(/kanbanStateBoard(\d+)/);
+    const match = element.id.match(/kanbanStateBoard(\d+)/)
     if (match) {
-      return parseInt(match[1], 10) - 1; // Extract the number and return it, zero-based index
+      return parseInt(match[1], 10) - 1 // Extract the number and return it, zero-based index
     }
-    element = element.parentElement as HTMLElement;
+    element = element.parentElement as HTMLElement
   }
-  return -1;
+  return -1
 }
 
 const onDragStateStart = (event: DragEvent, index: number) => {
-  draggedIndex = index;
-  event.dataTransfer?.setData('text/plain', String(index));
-};
+  draggedIndex = index
+  event.dataTransfer?.setData('text/plain', String(index))
+}
 
 const dragAndDropState = (event: DragEvent) => {
-  event.preventDefault();
-  const target = event.target as HTMLElement;
-  const targetIndex = hasParentWithId(target);
+  event.preventDefault()
+  const target = event.target as HTMLElement
+  const targetIndex = hasParentWithId(target)
 
   if (draggedIndex === null || targetIndex === -1 || draggedIndex === targetIndex) {
-    return;
+    return
   }
 
-  const draggedBoard = kanbanBoards.value[draggedIndex];
+  const draggedBoard = kanbanBoards.value[draggedIndex]
 
   if (!draggedBoard) {
-    console.error('Dragged board is undefined');
-    return;
+    console.error('Dragged board is undefined')
+    return
   }
 
   // Remove the dragged item
-  kanbanBoards.value.splice(draggedIndex, 1);
+  kanbanBoards.value.splice(draggedIndex, 1)
 
   // Insert the dragged item at the target index
-  kanbanBoards.value.splice(targetIndex, 0, draggedBoard);
+  kanbanBoards.value.splice(targetIndex, 0, draggedBoard)
 
   // Update positions
   kanbanBoards.value.forEach((board, index) => {
     if (board) {
-      board.position = index + 1;
+      board.position = index + 1
     } else {
-      console.error(`Board at index ${index} is undefined`);
+      console.error(`Board at index ${index} is undefined`)
     }
-  });
+  })
 
-  draggedIndex = null; // Reset draggedIndex
-  projectCRUD.updateStatePositions(kanbanBoards.value);
-};
-
-const dragAvailableUser = (event: DragEvent, user: User) => {
-  event.dataTransfer?.setData('userID', user._id)
-  event.dataTransfer?.setData('user_fName', user.fName)
-  event.dataTransfer?.setData('user_lName', user.lName)
-  event.dataTransfer?.setData('user_color', user.color)
-}
-
-const dragAvailableUserEnd = (index: number) => {
+  draggedIndex = null // Reset draggedIndex
+  projectCRUD.updateStatePositions(kanbanBoards.value)
 }
 
 const loadStates = async (projectID: string) => {
-  await projectCRUD.loadStatesFromProjectID(projectID).then(async (data: any) => {
+  await projectCRUD.loadStatesFromProjectID(projectID).then(async (data) => {
     kanbanBoards.value = []
     memberInfo.value = []
     taskMembers.member = []
 
-    await data.project[0].stateInfo.map(async (board: State) => {
-      const tempTaskArray = data.project[0].taskArray.filter((task: any) => {
+    await data.project[0].stateInfo.map(async (board) => {
+      const temp = data.project[0].taskArray.filter((task) => {
         return task.stateID == board.stateID
       })
       kanbanBoards.value.push({
         stateID: board.stateID,
         stateName: board.stateName,
         position: board.position,
-        taskArray: tempTaskArray
+        taskArray: temp
       })
     })
-    kanbanBoards.value.sort((a, b) => a?.position - b?.position);
+    kanbanBoards.value.sort((a, b) => a?.position - b?.position)
 
-    await data.project[0].membersInfo.map(async (member: any) => {
+    await data.project[0].membersInfo.map(async (member) => {
       memberInfo.value.push({
-        _id: member._id,
+        id: member._id,
         email: member.email,
         fName: member.fName,
         lName: member.lName,
@@ -509,8 +236,7 @@ const handleDrop = async (targetBoardIndex: number, targetTaskIndex: number) => 
       // Update the position of all tasks in the target board
       kanbanBoards.value[targetBoardIndex].taskArray.forEach(async (task, index) => {
         if (task.stateID !== kanbanBoards.value[targetBoardIndex].stateID) {
-          await taskCRUD.updateTaskState(task._id, kanbanBoards.value[targetBoardIndex].stateID)
-
+          await taskCRUD.updateTaskState(task.id, kanbanBoards.value[targetBoardIndex].stateID)
         }
 
         task.position = index
@@ -522,7 +248,7 @@ const handleDrop = async (targetBoardIndex: number, targetTaskIndex: number) => 
       await taskCRUD.updateTaskPosition(kanbanBoards.value[targetBoardIndex].taskArray)
     }
   } catch (error: any) {
-    console.log({ Title: 'error when moving task position', message: error.message })
+    console.error({ Title: 'error when moving task position', message: error.message })
   }
 }
 // Drag over event handler to calculate the target task index
@@ -592,23 +318,12 @@ const editBoard = (boardID: string, boardName: string) => {
   tempBoardID.value = boardID
 }
 
-const addTaskToBoard = (boardID: string) => {
-  // Find the index of the board with the matching ID
-  const index = kanbanBoards.value.findIndex((board) => board.stateID === boardID)
+const closeTaskModal = () => {
+  toggleModalFalse()
+}
 
-  // If the board is found
-  if (index !== -1) {
-    // Ensure taskArray exists or initialize it as an empty array
-    kanbanBoards.value[index].taskArray = kanbanBoards.value[index].taskArray || []
-    // Push the task to taskArray
-    kanbanBoards.value[index].taskArray?.push({
-      taskTitle: tempTaskname.value
-    })
-
-    tempTaskname.value = ''
-  } else {
-    console.log('Board not found')
-  }
+const closeEditBoardModal = () => {
+  toggleModalFalse()
 }
 
 const toggleModalFalse = () => {
@@ -618,52 +333,9 @@ const toggleModalFalse = () => {
   refBoardIndex.value = -1
   refTaskIndex.value = -1
 }
-
-const updateTask = async () => {
-  const data = {
-    taskID: updateSingleTask.value._id,
-    taskTitle: updateSingleTask.value.taskTitle,
-    taskDescription: updateSingleTask.value.taskDescription,
-    assignedToID: updateSingleTask.value.assignedToID,
-    labelColor: taskColor.value,
-    hoursExpected: updateSingleTask.value.hoursExpected | 0,
-    hoursSpent: updateSingleTask.value.hoursSpent | 0
-  }
-
-  await taskCRUD.updateSingleTask(data)
-
-  await loadStates(projectID.value)
-  isShowingModal.value = false
-}
-
-const updateBoard = async () => {
-  const data = {
-    stateID: singleBoard.value.stateID,
-    stateName: newBoardName.value != '' ? newBoardName.value : singleBoard.stateName,
-    taskArray: singleBoard.value.taskArray
-  }
-
-  await projectCRUD.updateSingleProjectBoard(data)
-}
-
-// Sanitize the input value to contain only numeric characters
-// type defines what which input was throwing the event
-const sanitizeInput = (type: number) => {
-  switch (type) {
-    case 1:
-      updateSingleTask.value.hoursExpected = updateSingleTask.value.hoursExpected.replace(/\D/g, '')
-      break
-    case 2:
-      updateSingleTask.value.hoursSpent = updateSingleTask.value.hoursSpent.replace(/\D/g, '')
-      break
-
-    default:
-      break
-  }
-}
 </script>
 
-<style scoped>
+<style>
 /* Add your styles here */
 
 .editBoardModal.show {
@@ -755,10 +427,5 @@ const sanitizeInput = (type: number) => {
 
 .draggable_wrapper {
   margin: 0.25rem;
-}
-
-.userAvatarIteration {
-  width: 36px;
-  height: 36px;
 }
 </style>

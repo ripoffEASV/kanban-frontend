@@ -11,7 +11,7 @@ import userAvatar from '../components/userAvatar.vue'
 
 const inviteArray = ref<string[]>([])
 const ownerArray = ref<User[]>([])
-const memberArray = ref<User[]>([])
+const memberArray = ref([] as User[])
 const inputEmail = ref('')
 const isDisabledAddUser = ref(true)
 
@@ -80,14 +80,18 @@ const addOrganization = async () => {
     }
     const owners = ownerArray.value.map((o) => o.id) as string[]
 
-    console.log(props.org)
+    // let userIDArray: any = []
+
+    // memberArray.value.forEach((user) => {
+    //   userIDArray.push(user.id)
+    // })
 
     const org: Organization = {
-      orgID: props.org._id,
+      orgID: props.org.orgID,
       orgName: formGroup.value.inputOrgName,
       createdByID: props.org.createdByID,
       ownerID: owners,
-      orgMembers: props.org.orgMembers,
+      orgMembers: memberArray.value,
       projectIDs: props.org.projectIDs,
       inviteArray: inviteArray.value
     }
@@ -105,7 +109,7 @@ const deleteOrg = async () => {
     return
   }
   try {
-    await deleteOrganization(props.org._id)
+    await deleteOrganization(props.org.orgID)
     toggleFalseSettingsModal()
   } catch (error) {
     console.error(error)
@@ -147,15 +151,15 @@ const isEmailValid = () => {
 
           <div class="modal_flex_item flex-row">
             <userAvatar
-              :f-name="props.org.createdByUser[0].fName"
-              :l-name="props.org.createdByUser[0].lName"
-              :color="props.org.createdByUser[0].color"
+              :f-name="props.org.createdByUser.fName"
+              :l-name="props.org.createdByUser.lName"
+              :color="props.org.createdByUser.color"
             >
             </userAvatar>
             <span class="ms-1 my-auto text-dark">
-              {{ props.org.createdByUser[0].fName }}
-              {{ props.org.createdByUser[0].lName }}
-              ({{ props.org.createdByUser[0].email }})
+              {{ props.org.createdByUser.fName }}
+              {{ props.org.createdByUser.lName }}
+              ({{ props.org.createdByUser.email }})
             </span>
           </div>
         </div>
@@ -183,30 +187,34 @@ const isEmailValid = () => {
         <h1 class="text-black mt-2">Current members</h1>
         <OverlayScrollbarsComponent class="existing_members_div" v-if="memberArray.length > 0">
           <div v-for="(user, index) in memberArray" :key="user.id">
-            <div class="existing_user_item">
-              <span class="text-dark">
-                {{ index + 1 }}: {{ user.fName }} {{ user.lName }} ({{ user.email }})
-                <i
-                  v-if="ownerArray.some((owner) => owner.id === user.id)"
-                  v-b-tooltip.hover
-                  title="This user is an owner"
-                  class="bi bi-asterisk"
-                ></i>
-              </span>
-              <button
-                @click="removeMember(index)"
-                type="button"
-                class="btn btn-danger px-2 py-0 ms-auto"
-              >
-                X
-              </button>
-              <button
-                @click="toggleOwner(user)"
-                type="button"
-                class="btn btn-primary px-2 py-0 ms-auto"
-              >
-                {{ ownerArray.some((owner) => owner.id === user.id) ? 'Demote' : 'Promote' }}
-              </button>
+            <div class="existing_user_item flex-row">
+              <div class="w-60">
+                <span class="text-dark">
+                  {{ index + 1 }}: {{ user.fName }} {{ user.lName }} ({{ user.email }})
+                  <i
+                    v-if="ownerArray.some((owner) => owner.id === user.id)"
+                    v-b-tooltip.hover
+                    title="This user is an owner"
+                    class="bi bi-asterisk"
+                  ></i>
+                </span>
+              </div>
+              <div class="ms-auto d-flex flex-row">
+                <button
+                  @click="removeMember(index)"
+                  type="button"
+                  class="btn btn-danger px-2 py-0 my-auto mx-auto"
+                >
+                  X
+                </button>
+                <button
+                  @click="toggleOwner(user)"
+                  type="button"
+                  class="btn btn-primary px-2 py-0 my-auto mx-auto"
+                >
+                  {{ ownerArray.some((owner) => owner.id === user.id) ? 'Demote' : 'Promote' }}
+                </button>
+              </div>
             </div>
           </div>
         </OverlayScrollbarsComponent>

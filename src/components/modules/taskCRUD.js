@@ -1,8 +1,8 @@
-import * as GLOBAL from '../Globals/GLOBALS'
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const updateSingleTask = async (taskData) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/updateSingleTask', {
+    await fetch(baseURL + 'tasks/updateSingleTask', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -12,19 +12,18 @@ export const updateSingleTask = async (taskData) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('Done')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const deleteSingleTask = async (taskID) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/deleteSingleTask', {
+    await fetch(baseURL + 'tasks/deleteSingleTask', {
       method: 'DELETE', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -34,19 +33,18 @@ export const deleteSingleTask = async (taskID) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log('Task Deleted')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const updateTaskPosition = async (taskList) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/updateTaskPosition', {
+    await fetch(baseURL + 'tasks/updateTaskPosition', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -56,19 +54,18 @@ export const updateTaskPosition = async (taskList) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log('Task Deleted')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const updateTaskState = async (taskID, newStateID) => {
   try {
-    await fetch(GLOBAL.URL + 'tasks/updateTaskState', {
+    await fetch(baseURL + 'tasks/updateTaskState', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -81,12 +78,11 @@ export const updateTaskState = async (taskID, newStateID) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log('Task Deleted')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }

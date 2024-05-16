@@ -1,4 +1,4 @@
-import * as GLOBAL from '../Globals/GLOBALS'
+const baseURL = import.meta.env.VITE_API_URL;
 import { useAuthStore } from '../../stores/authStore';
 
 export default function userCrud() {
@@ -11,7 +11,7 @@ export default function userCrud() {
         password: password
       }
 
-      const response = await fetch(GLOBAL.URL + 'users/login', {
+      const response = await fetch(baseURL + 'users/login', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
@@ -48,7 +48,7 @@ export default function userCrud() {
         password
       }
   
-      const response = await fetch(GLOBAL.URL + 'users/register', {
+      const response = await fetch(baseURL + 'users/register', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
@@ -69,14 +69,13 @@ export default function userCrud() {
 
   const logout = async () => {
     try {
-      const response = await fetch(GLOBAL.URL + 'users/logout', {
+      const response = await fetch(baseURL + 'users/logout', {
         method: 'GET',
         credentials: 'include'
       });
 
       if (response.ok) {
         authStore.logout();
-        console.log('Logged out successfully');
       } else {
         console.error('Failed to log out');
       }
@@ -87,7 +86,7 @@ export default function userCrud() {
   
   const getUserDetails = async () => {
     try {
-      const response = await fetch(GLOBAL.URL + 'users/find-user', {
+      const response = await fetch(baseURL + 'users/find-user', {
         method: 'GET',
         credentials: 'include'
       });
@@ -104,7 +103,7 @@ export default function userCrud() {
 
   const updateUser = async (user) => {
     try {
-      const response = await fetch(GLOBAL.URL + 'users/update-user', {
+      const response = await fetch(baseURL + 'users/update-user', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -125,7 +124,7 @@ export default function userCrud() {
 
   const deleteUser = async () => {
     try {
-      const response = await fetch(GLOBAL.URL + 'users/delete', {
+      const response = await fetch(baseURL + 'users/delete', {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -136,7 +135,7 @@ export default function userCrud() {
         return false;
       }
     } catch (err) {
-      console.log('Error failed to delete user', err);
+      console.error('Error failed to delete user', err);
       return false;
     }
   }

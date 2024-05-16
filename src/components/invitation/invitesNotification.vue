@@ -21,7 +21,7 @@ const togglePopUp = () => {
 </script>
 
 <template>
-  <article class="p-4">
+  <article class="p-4" v-if="invitationDisplay > '0'">
     <section class="flex justify-center items-center bg-blue-600 w-10 h-10 rounded-full relative cursor-pointer"
       @click="togglePopUp">
       <i class="bi bi-bell-fill text-3xl text-white"></i>

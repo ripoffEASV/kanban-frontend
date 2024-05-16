@@ -18,8 +18,8 @@ onMounted(() => {
 
 <template>
     <article class="flex max-h-64 w-48">
-        <section class="flex flex-col w-full overflow-auto">
-            <div v-for="inv in invitations" :key="inv.id">
+        <section class="flex flex-col w-full overflow-auto !border bg-slate-900">
+            <div v-for="inv in invitations" :key="inv.id" class="!border-b !border-dashed ">
                 <SingleInvitation :inv="inv"></SingleInvitation>
             </div>
         </section>

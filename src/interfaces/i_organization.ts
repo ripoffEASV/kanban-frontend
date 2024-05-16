@@ -1,14 +1,14 @@
 import type { User } from '../interfaces/i_user'
 export interface Organization {
-  orgID: number
+  orgID: string
   orgName: string
   createdByID: string
   ownerID: string[]
-  orgMembers?: string[]
+  orgMembers?: User[]
   projectIDs?: string[]
   inviteArray?: string[]
   owner?: User[]
   createdByUser?: User[]
   members?: User[]
-  _id?: string
+  id?: string
 }

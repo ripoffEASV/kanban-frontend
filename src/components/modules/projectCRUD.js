@@ -1,8 +1,8 @@
-import * as GLOBAL from '../Globals/GLOBALS'
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const loadStatesFromProjectID = async (projectID) => {
   try {
-    const project = await fetch(GLOBAL.URL + 'projects/getSpecificProject/' + projectID)
+    const project = await fetch(baseURL + 'projects/getSpecificProject/' + projectID)
     return project.json()
   } catch (error) {
     alert('Cannot load project boards')
@@ -11,7 +11,7 @@ export const loadStatesFromProjectID = async (projectID) => {
 
 export const updateSingleProjectBoard = async (boardData) => {
   try {
-    await fetch(GLOBAL.URL + 'projects/updateSingleProjectBoard', {
+    await fetch(baseURL + 'projects/updateSingleProjectBoard', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -21,21 +21,19 @@ export const updateSingleProjectBoard = async (boardData) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('Done')
       })
       .catch((err) => {
         alert(err.message)
       })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const getProjectData = async (projectID) => {
   try {
-    console.log(projectID)
 
-    const projectData = await fetch(GLOBAL.URL + 'projects/getSingleProject', {
+    const projectData = await fetch(baseURL + 'projects/getSingleProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -48,13 +46,13 @@ export const getProjectData = async (projectID) => {
 
     return projectData.json()
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const updateProjectData = async (projectData) => {
   try {
-    await fetch(GLOBAL.URL + 'projects/updateProjectData', {
+    await fetch(baseURL + 'projects/updateProjectData', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -65,13 +63,13 @@ export const updateProjectData = async (projectData) => {
       alert(err.message)
     })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
 export const deleteProject = async (projectID) => {
   try {
-    await fetch(GLOBAL.URL + 'projects/deleteProject', {
+    await fetch(baseURL + 'projects/deleteProject', {
       method: 'DELETE', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'content-type': 'application/json'
@@ -82,7 +80,7 @@ export const deleteProject = async (projectID) => {
       console.error(err.message)
     })
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -94,7 +92,7 @@ export const updateStatePositions = async (allStates) => {
     };
   });
   try {
-    await fetch(GLOBAL.URL + 'projects/updateStatesPos', {
+    await fetch(baseURL + 'projects/updateStatesPos', {
       method: 'POST',
       headers: {
         'content-type': 'application/json'

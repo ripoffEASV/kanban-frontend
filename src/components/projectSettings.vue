@@ -8,19 +8,19 @@ import * as projectCRUD from './modules/projectCRUD'
 
 const props = defineProps<{
   orgMembers: User[]
-  projectRef: Project
+  projectRef: any
 }>()
 
 const tempBoardName = ref('')
 
 const projectBoards = ref([] as State[])
-const assignedMembers = ref([] as User[])
+const assignedMembers = ref([] as any[])
 const newProjectName = ref('')
 
 onMounted(() => {
   props.projectRef[0].projectStates?.forEach((board) => {
     projectBoards.value.push({
-      ID: board._id,
+      id: board._id,
       stateName: board.stateName,
       position: board.position
     })
@@ -28,7 +28,7 @@ onMounted(() => {
 
   props.projectRef[0].membersInfo?.forEach((member) => {
     assignedMembers.value.push({
-      _id: member._id,
+      id: member._id,
       email: member.email,
       fName: member.fName,
       lName: member.lName,
@@ -36,33 +36,35 @@ onMounted(() => {
     })
   })
 })
-const isMemberInTaskMembers = (member) => {
-  const isUserInAssignedToArray = assignedMembers.value.some((user) => {
-    return user.id === member._id || user._id === member._id
+const isMemberInTaskMembers = (member: User) => {
+  const isUserInAssignedToArray = assignedMembers.value.some((user: User) => {
+    return user.id === member.id
   })
   return isUserInAssignedToArray
 }
 
 const handleDropAvailableUser = (event: DragEvent) => {
-  console.log('drag dropped: ', event.target)
-
-  const user: User = {
-    _id: event.dataTransfer?.getData('userID'),
+  const user = {
+    id: event.dataTransfer?.getData('userID'),
     fName: event.dataTransfer?.getData('user_fName'),
     lName: event.dataTransfer?.getData('user_lName'),
     color: event.dataTransfer?.getData('user_color')
   }
-  console.log('assignedToID: ', user)
+
   assignedMembers.value.push(user)
+  // props.orgMembers.some((user, index) => {
+  //   if (user.id == event.dataTransfer?.getData('userID')) {
+  //     assignedMembers.value.splice(index, 1)
+  //   }
+  // })
 }
 
 const handleDropWorkingUser = (event: DragEvent) => {
-  console.log('Drop event occurred')
   let target = event.target as HTMLElement
 
   // Traverse up the DOM tree until a parent node with the class 'available' is found
   while (target && !target.classList.contains('available')) {
-    target = target.parentElement
+    target = target.parentElement as HTMLElement
   }
 
   // Check if a parent node with the class 'available' was found
@@ -71,31 +73,22 @@ const handleDropWorkingUser = (event: DragEvent) => {
 
     const userID = event.dataTransfer?.getData('userID')
 
-    console.log(userID)
-
     assignedMembers.value.some((user, index) => {
-      console.log(index)
-      if (user._id == userID) {
-        console.log('match!: ', index)
+      if (user.id == userID) {
         assignedMembers.value.splice(index, 1)
       }
     })
   }
 }
 
-const dragAvailableUser = (event: DragEvent, user: User) => {
-  console.log('drag started')
-  console.log('Dragged Target: ', event.target)
-  console.log(user)
-  event.dataTransfer?.setData('userID', user._id)
+const dragAvailableUser = (event: DragEvent, user) => {
+  event.dataTransfer?.setData('userID', user.id)
   event.dataTransfer?.setData('user_fName', user.fName)
   event.dataTransfer?.setData('user_lName', user.lName)
   event.dataTransfer?.setData('user_color', user.color)
 }
 
-const dragAvailableUserEnd = (index: number) => {
-  console.log('Drag ended: ', index)
-}
+const dragAvailableUserEnd = (index: number) => {}
 
 const updateProjectCRUD = async () => {
   try {
@@ -107,17 +100,17 @@ const updateProjectCRUD = async () => {
     }
 
     await projectCRUD.updateProjectData(data).then(() => {
-      emits('close')
+      emits('reload')
     })
   } catch (error: any) {
-    console.log('something went wrong when updating project')
+    console.error('something went wrong when updating project')
   }
 }
 
 const addNewBoard = () => {
   if (tempBoardName.value !== '') {
     projectBoards.value.push({
-      ID: '',
+      id: '',
       stateName: tempBoardName.value,
       position: projectBoards.value.length + 1
     })
@@ -126,14 +119,13 @@ const addNewBoard = () => {
   tempBoardName.value = ''
 }
 
-const emits = defineEmits(['close'])
+const emits = defineEmits(['close', 'reload'])
 
 const closeModal = () => {
   emits('close')
 }
 
 const deleteBoard = (boardID: string, index: number) => {
-  console.log(boardID)
   if (boardID) {
     projectBoards.value[index].delete = !projectBoards.value[index].delete
   } else {
@@ -142,8 +134,7 @@ const deleteBoard = (boardID: string, index: number) => {
 }
 
 const deleteProject = async () => {
-  await projectCRUD.deleteProject(props.projectRef[0]._id).then(() => {
-    console.log('plx')
+  await projectCRUD.deleteProject(props.projectRef[0].id).then(() => {
     emits('close')
   })
 }
@@ -198,7 +189,7 @@ const deleteProject = async () => {
                     <button
                       :class="board.delete ? ' btn-danger' : ' btn-outline-danger'"
                       class="px-1 py-0 btn"
-                      @click="deleteBoard(board.ID, index)"
+                      @click="deleteBoard(board.id, index)"
                     >
                       <i class="bi bi-x"></i>
                     </button>

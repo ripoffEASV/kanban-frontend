@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // You can add any additional logic or data setup here if needed
 </script>
 
