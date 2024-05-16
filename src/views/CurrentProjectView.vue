@@ -10,11 +10,12 @@
         v-for="(board, boardIndex) in kanbanBoards"
         :key="boardIndex"
         draggable="true"
+        @dragover.prevent
         @dragstart="onDragStateStart($event, boardIndex)"
         :id="'kanbanStateBoard' + (boardIndex + 1)"
       >
         <div class="kanban_outerBorder">
-          <h2 class="kanban_title" @dblclick="editBoard(board.id, board.stateName)">
+          <h2 class="kanban_title" @dblclick="editBoard(board.stateID, board.stateName)">
             {{ board.stateName }}
           </h2>
           <div class="separator"></div>
@@ -31,6 +32,7 @@
                 v-for="(task, taskIndex) in board.taskArray"
                 :key="taskIndex"
                 draggable="true"
+                @dragover.prevent
                 @dragstart="handleDragStart(boardIndex, taskIndex, $event)"
                 @dragend="handleDragEnd"
                 @dblclick="editTask(boardIndex, taskIndex, task.id)"
@@ -66,7 +68,7 @@
     </div>
   </div>
 
-  <div :v-if="singleBoard != 'null'">
+  <div :v-if="singleBoard.length > 0">
     <div
       class="modal fade editBoardModal"
       :class="{ show: isShowingEditBoardModal }"
@@ -74,7 +76,7 @@
       aria-labelledby="editBoardModal"
     >
       <editBoardModal
-        :singleBoard="singleBoard"
+        :board="singleBoard"
         @close="closeEditBoardModal"
         @reload="reloadPage"
       ></editBoardModal>
@@ -105,7 +107,7 @@ const refBoardIndex = ref(-1)
 const refTaskIndex = ref(-1)
 const projectID = ref()
 const kanbanBoards = ref([] as any[])
-const singleBoard = ref('null')
+const singleBoard = ref([] as any[])
 const updateSingleTask = ref([] as any[])
 const memberInfo = ref([] as any[])
 const taskColor = ref('')
@@ -118,6 +120,7 @@ const dragTaskIndex = ref(-1) // Index of the dragged task
 let draggedIndex: number | null = null
 
 onMounted(() => {
+  console.log(singleBoard.value.length)
   reloadPage()
 })
 
@@ -251,6 +254,7 @@ const handleDrop = async (targetBoardIndex: number, targetTaskIndex: number) => 
     console.error({ Title: 'error when moving task position', message: error.message })
   }
 }
+
 // Drag over event handler to calculate the target task index
 const handleDragOver = (boardIndex: number, event: DragEvent) => {
   // Get the index of the dragged task
@@ -310,9 +314,15 @@ const editTask = (boardIndex: number, taskIndex: number, taskID: string) => {
 
 const editBoard = (boardID: string, boardName: string) => {
   isShowingEditBoardModal.value = true
+  //
+  let tempIndex = kanbanBoards.value.findIndex((board) => {
+    console.log(boardID, board.stateID)
+    return board.stateID === boardID
+  })
+  console.log(tempIndex)
 
-  let tempIndex = kanbanBoards.value.findIndex((board) => board.stateID === boardID)
   singleBoard.value = kanbanBoards.value[tempIndex]
+  console.log(singleBoard.value)
 
   tempBoardHeader.value = boardName
   tempBoardID.value = boardID

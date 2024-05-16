@@ -18,7 +18,7 @@
               type="text"
               class="form-control"
               v-model="newBoardName"
-              :placeholder="props.singleBoard.stateName"
+              :placeholder="props.board.stateName"
             />
           </div>
         </div>
@@ -28,7 +28,7 @@
             <span class="text-dark">Tasks in board:</span>
           </div>
           <div class="modal_flex_item">
-            <div v-for="(task, index) in props.singleBoard.taskArray">
+            <div v-for="(task, index) in props.board.taskArray">
               <span class="me-1 text-dark">{{ index + 1 }}:</span>
               <span class="text-dark">{{ task.taskTitle }}</span>
             </div>
@@ -57,7 +57,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Task } from '@/interfaces/i_task'
 import { ref } from 'vue'
 
 import * as projectCRUD from '../components/modules/projectCRUD'
@@ -68,7 +67,7 @@ const tempTaskArray = ref([] as any[])
 const tempTaskname = ref('')
 
 const props = defineProps<{
-  singleBoard: any
+  board: any
 }>()
 
 const emits = defineEmits(['close', 'reload'])
@@ -78,7 +77,7 @@ const close = () => {
 
 const updateBoard = async () => {
   // save tasks temporarily
-  let mergeTaskArrays = props.singleBoard.taskArray
+  let mergeTaskArrays = props.board.taskArray
 
   // merge created tasks
   if (tempTaskArray.value.length > 0) {
@@ -88,13 +87,14 @@ const updateBoard = async () => {
   }
 
   const data = {
-    stateID: props.singleBoard.stateID,
-    stateName: newBoardName.value != '' ? newBoardName.value : props.singleBoard.stateName,
+    stateID: props.board.stateID,
+    stateName: newBoardName.value != '' ? newBoardName.value : props.board.stateName,
     taskArray: tempTaskArray.value
   }
 
+  tempTaskArray.value = []
+
   await projectCRUD.updateSingleProjectBoard(data)
-  
 }
 
 const addTaskToBoard = () => {

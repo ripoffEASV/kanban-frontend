@@ -75,7 +75,7 @@ const closeModal = () => {
       <div class="d-flex flex-column">
         <span>Members:</span>
         <OverlayScrollbarsComponent class="members_container">
-          <div class="members_scrollable_container" v-for="user in props.project.inviteArray">
+          <div class="members_scrollable_container" v-for="user in props.orgMembers">
             <userAvatar
               class="mx-1 my-1"
               :fName="user.fName"

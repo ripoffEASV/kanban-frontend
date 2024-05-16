@@ -20,8 +20,7 @@ export const updateSingleProjectBoard = async (boardData) => {
       body: JSON.stringify(boardData) // body data type must match "Content-Type" header)
     })
       .then((res) => res.json())
-      .then((data) => {
-      })
+      .then((data) => {})
       .catch((err) => {
         alert(err.message)
       })
@@ -32,7 +31,6 @@ export const updateSingleProjectBoard = async (boardData) => {
 
 export const getProjectData = async (projectID) => {
   try {
-
     const projectData = await fetch(GLOBAL.URL + 'projects/getSingleProject', {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
@@ -85,12 +83,12 @@ export const deleteProject = async (projectID) => {
 }
 
 export const updateStatePositions = async (allStates) => {
-  const states = allStates.map(state => {
+  const states = allStates.map((state) => {
     return {
       position: state.position,
       ID: state.stateID
-    };
-  });
+    }
+  })
   try {
     await fetch(GLOBAL.URL + 'projects/updateStatesPos', {
       method: 'POST',
@@ -99,8 +97,8 @@ export const updateStatePositions = async (allStates) => {
       },
       credentials: 'include',
       body: JSON.stringify(states)
-    });
+    })
   } catch (err) {
-    console.error(err.message);
+    console.error(err.message)
   }
 }
